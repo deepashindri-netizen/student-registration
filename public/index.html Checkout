@@ -1,156 +1,92 @@
+<div id="message" role="status" aria-live="polite"></div>
 
-<!doctype html>
-<html lang="kn">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ವಿದ್ಯಾರ್ಥಿ ನೋಂದಣಿ ಪೋರ್ಟಲ್</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f0f4f8;
-      margin: 0;
-      padding: 20px;
-      color: #1f2937;
-    }
-    .container {
-      max-width: 520px;
-      margin: 25px auto;
-      background: white;
-      padding: 24px;
-      border-radius: 14px;
-      box-shadow: 0 4px 18px #0001;
-    }
-    h1 { color: #174ea6; text-align: center; }
-    label { display: block; margin-top: 16px; font-weight: bold; }
-    input {
-      box-sizing: border-box;
-      width: 100%;
-      padding: 12px;
-      margin-top: 7px;
-      border: 1px solid #cbd5e1;
-      border-radius: 7px;
-    }
-    .fee {
-      margin: 20px 0;
-      padding: 14px;
-      background: #eef5ff;
-      border-radius: 8px;
-      font-size: 20px;
-      font-weight: bold;
-    }
-    button {
-      width: 100%;
-      padding: 14px;
-      background: #1756b3;
-      color: white;
-      border: 0;
-      border-radius: 8px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    #message { white-space: pre-wrap; margin-top: 16px; }
-    .note { font-size: 13px; color: #64748b; line-height: 1.6; }
-  </style>
-</head>
-<body>
-  <main class="container">
-    <h1>🎓 ವಿದ್ಯಾರ್ಥಿ ನೋಂದಣಿ</h1>
-    <p>ವಿದ್ಯಾರ್ಥಿಯ ವಿವರಗಳನ್ನು ಭರ್ತಿ ಮಾಡಿ.</p>
+<script>
+const form = document.getElementById("registrationForm");
+const message = document.getElementById("message");
+const button = form.querySelector('[type="submit"]');
 
-    <form id="registrationForm">
-      <label>ವಿದ್ಯಾರ್ಥಿಯ ಹೆಸರು
-        <input name="studentName" required maxlength="120">
-      </label>
+form.addEventListener("submit", async function(event) {
+  event.preventDefault();
 
-      <label>ತಂದೆಯ ಹೆಸರು
-        <input name="fatherName" required maxlength="120">
-      </label>
+  if (!window.Razorpay) {
+    message.textContent = "ಪಾವತಿ ಪುಟ ಲೋಡ್ ಆಗಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.";
+    return;
+  }
 
-      <label>ಜನ್ಮ ದಿನಾಂಕ
-        <input name="dob" type="date" required>
-      </label>
+  button.disabled = true;
+  message.textContent = "ಪಾವತಿ ವಿವರಗಳನ್ನು ಸಿದ್ಧಪಡಿಸಲಾಗುತ್ತಿದೆ...";
 
-      <label>ಮೊಬೈಲ್ ಸಂಖ್ಯೆ
-        <input name="mobile" type="tel" inputmode="numeric"
-          pattern="[6-9][0-9]{9}" maxlength="10"
-          placeholder="10 ಅಂಕಿಗಳ ಸಂಖ್ಯೆ" required>
-      </label>
+  try {
+    const data = Object.fromEntries(new FormData(form).entries());
 
-      <label>UPI Transaction ID
-        <input name="upiTxnRef" maxlength="100"
-          placeholder="ಪಾವತಿ ಮಾಡಿದ ನಂತರ ನಮೂದಿಸಿ">
-      </label>
+    const response = await fetch("/api/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
 
-      <div class="fee">ನೋಂದಣಿ ಶುಲ್ಕ: ₹250</div>
+    const order = await response.json();
+    if (!response.ok) throw new Error(order.error || "Order ರಚಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ.");
 
-      <button type="submit" id="submitButton">
-        ನೋಂದಣಿ ಮುಂದುವರಿಸಿ
-      </button>
-    </form>
+    const checkout = new Razorpay({
+      key: order.keyId,
+      amount: order.amount,
+      currency: order.currency,
+      name: order.merchantName,
+      description: "ವಿದ್ಯಾರ್ಥಿ ನೋಂದಣಿ ಶುಲ್ಕ",
+      order_id: order.orderId,
+      prefill: {
+        name: data.studentName,
+        contact: data.mobile
+      },
+      handler: async function(payment) {
+        message.textContent = "ಪಾವತಿಯನ್ನು ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ...";
 
-    <div id="message" role="status"></div>
-    <div id="payment"></div>
+        try {
+          const verifyResponse = await fetch("/api/payments/verify", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              registrationId: order.registrationId,
+              razorpay_order_id: payment.razorpay_order_id,
+              razorpay_payment_id: payment.razorpay_payment_id,
+              razorpay_signature: payment.razorpay_signature
+            })
+          });
 
-    <p class="note">
-      ಸೂಚನೆ: ಈ ಫಾರ್ಮ್ ನಿಮ್ಮ ಸರ್ವರ್‌ನಲ್ಲಿರುವ /api/register
-      API ಅನ್ನು ಬಳಸುತ್ತದೆ. UPI ಪಾವತಿ ಸ್ವಯಂಚಾಲಿತವಾಗಿ
-      ದೃಢೀಕರಿಸುವ ವ್ಯವಸ್ಥೆ ಇನ್ನೂ ಪ್ರತ್ಯೇಕವಾಗಿ ಸೇರಿಸಬೇಕು.
-    </p>
-  </main>
+          const result = await verifyResponse.json();
+          if (!verifyResponse.ok) {
+            throw new Error(result.error || "ಪಾವತಿ ದೃಢೀಕರಿಸಲಾಗಲಿಲ್ಲ.");
+          }
 
-  <script>
-    const form = document.getElementById("registrationForm");
-    const message = document.getElementById("message");
-    const payment = document.getElementById("payment");
-    const button = document.getElementById("submitButton");
-
-    form.addEventListener("submit", async function(event) {
-      event.preventDefault();
-      message.textContent = "ದಯವಿಟ್ಟು ಕಾಯಿರಿ...";
-      payment.replaceChildren();
-      button.disabled = true;
-
-      try {
-        const data = Object.fromEntries(new FormData(form).entries());
-
-        const response = await fetch("/api/register", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data)
-        });
-
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.error || "ದೋಷ ಸಂಭವಿಸಿದೆ.");
-
-        message.textContent =
-          "ನೋಂದಣಿ ಅರ್ಜಿ ಸ್ವೀಕರಿಸಲಾಗಿದೆ. ಅರ್ಜಿ ಸಂಖ್ಯೆ: " + result.id;
-
-        const heading = document.createElement("h3");
-        heading.textContent = "₹250 UPI ಪಾವತಿ ಮಾಡಿ";
-        payment.appendChild(heading);
-
-        const qr = document.createElement("img");
-        qr.src = result.qrDataUrl;
-        qr.alt = "UPI ಪಾವತಿ QR ಕೋಡ್";
-        qr.style.cssText = "display:block;width:260px;max-width:100%;margin:12px auto";
-        payment.appendChild(qr);
-
-        const link = document.createElement("a");
-        link.href = result.paymentUri;
-        link.textContent = "UPI App ತೆರೆಯಿರಿ";
-        link.style.cssText = "display:block;text-align:center;margin:12px";
-        payment.appendChild(link);
-
-        const note = document.createElement("p");
-        note.textContent = result.note;
-        payment.appendChild(note);
-      } catch (error) {
-        message.textContent = "ದೋಷ: " + error.message;
-      } finally {
-        button.disabled = false;
+          message.textContent =
+            "ನೋಂದಣಿ ಯಶಸ್ವಿಯಾಗಿದೆ! Registration Number: " +
+            result.registrationNumber;
+          form.reset();
+        } catch (error) {
+          message.textContent = error.message +
+            " ನಿಮ್ಮ ಪಾವತಿ ಸ್ಥಿತಿಯನ್ನು ಪರಿಶೀಲಿಸಲು ಸಹಾಯಕ್ಕಾಗಿ ಸಂಪರ್ಕಿಸಿ.";
+        }
+      },
+      modal: {
+        ondismiss: function() {
+          message.textContent =
+            "ಪಾವತಿ ಪೂರ್ಣಗೊಂಡಿಲ್ಲ ಅಥವಾ Checkout ಮುಚ್ಚಲಾಗಿದೆ. ಅಗತ್ಯವಿದ್ದರೆ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.";
+          button.disabled = false;
+        }
       }
     });
-  </script>
-</body>
-</html>
+
+    checkout.on("payment.failed", function() {
+      message.textContent =
+        "ಪಾವತಿ ವಿಫಲವಾಗಿದೆ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.";
+      button.disabled = false;
+    });
+
+    checkout.open();
+  } catch (error) {
+    message.textContent = "ದೋಷ: " + error.message;
+    button.disabled = false;
+  }
+});
+</script>
