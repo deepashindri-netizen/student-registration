@@ -19,7 +19,16 @@ app.use(express.static(path.join(__dirname, "public")));
 const db = new Database(process.env.DB_PATH || "registrations.sqlite");
 db.pragma("journal_mode = WAL");
 db.exec(`
-CREATE TABLE IF NOT EXISTS registrations (
+CREATE TABLE IF NOT EXISTS registrations ( const columns = db.prepare(
+  "PRAGMA table_info(registrations)"
+).all().map(column => column.name);
+
+if (!columns.includes("razorpay_order_id")) {
+  db.exec("ALTER TABLE registrations ADD COLUMN razorpay_order_id TEXT");
+}
+
+if (!columns.includes("razorpay_payment_id")) {
+  db.exec("ALTER TABLE registrations ADD COLUMN razorpay_payment_id TEXT");
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   registration_no TEXT UNIQUE,
   student_name TEXT NOT NULL,
