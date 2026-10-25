@@ -69,6 +69,89 @@ app.get("/api/config", (req, res) => {
 });
 
 app.post("/api/register", async (req, res) => {
+  try {
+    const {
+      studentName,
+      fatherName,
+      dob,
+      mobile
+    } = req.body || {};
+
+    if (
+      ![studentName, fatherName, dob, mobile].every(
+        v => typeof v === "string" && v.trim()
+      )
+    ) {
+      return res.status(400).json({
+        error: "ಎಲ್ಲಾ ಅಗತ್ಯ ವಿವರಗಳನ್ನು ಭರ್ತಿ ಮಾಡಿ."
+      });
+    }
+
+    if (!/^[6-9]\d{9}$/.test(mobile.trim())) {
+      return res.status(400).json({
+        error: "ಸರಿಯಾದ 10 ಅಂಕಿಗಳ ಮೊಬೈಲ್ ಸಂಖ್ಯೆ ನಮೂದಿಸಿ."
+      });
+    }
+
+    if (
+      studentName.length > 120 ||
+      fatherName.length > 120
+    ) {
+      return res.status(400).json({
+        error: "ಹೆಸರು ತುಂಬಾ ಉದ್ದವಾಗಿದೆ."
+      });
+    }
+
+    if (
+      !process.env.RAZORPAY_KEY_ID ||
+      !process.env.RAZORPAY_KEY_SECRET
+    ) {
+      return res.status(503).json({
+        error: "Razorpay keys Render ನಲ್ಲಿ ಹೊಂದಿಸಿಲ್ಲ."
+      });
+    }
+
+    const info = insertRegistration.run({
+      student_name: studentName.trim(),
+      father_name: fatherName.trim(),
+      dob,
+      mobile: mobile.trim(),
+      upi_txn_ref: ""
+    });
+
+    const id = Number(info.lastInsertRowid);
+
+    const order = await razorpay.orders.create({
+      amount: 25000,
+      currency: "INR",
+      receipt: `stu_${id}`,
+      notes: {
+        registration_id: String(id)
+      }
+    });
+
+    db.prepare(`
+      UPDATE registrations
+      SET razorpay_order_id = ?
+      WHERE id = ?
+    `).run(order.id, id);
+
+    res.status(201).json({
+      registrationId: id,
+      orderId: order.id,
+      amount: order.amount,
+      currency: order.currency,
+      keyId: process.env.RAZORPAY_KEY_ID,
+      merchantName:
+        process.env.MERCHANT_NAME || "Student Registration"
+    });
+  } catch (error) {
+    console.error("Create order failed:", error.message);
+    res.status(500).json({
+      error: "ಪಾವತಿ ಆರಂಭಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ."
+    });
+  }
+});
   const { studentName, fatherName, dob, mobile, upiTxnRef = "" } = req.body || {};
   if (![studentName, fatherName, dob, mobile].every(v => typeof v === "string" && v.trim())) {
     return res.status(400).json({ error: "ಎಲ್ಲಾ ಅಗತ್ಯ ವಿವರಗಳನ್ನು ಭರ್ತಿ ಮಾಡಿ." });
