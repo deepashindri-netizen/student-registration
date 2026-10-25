@@ -68,7 +68,130 @@ app.get("/api/config", (req, res) => {
   res.json({ merchantName: process.env.MERCHANT_NAME || "Student Registration", upiConfigured: Boolean(process.env.UPI_ID) });
 });
 
-app.post("/api/register", async (req, res) => {
+app.post("/api/register", async (req, res) => { app.post("/api/payments/verify", async (req, res) => {
+  try {
+    const {
+      registrationId,
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature
+    } = req.body || {};
+
+    const id = Number(registrationId);
+    if (!Number.isSafeInteger(id) || id < 1) {
+      return res.status(400).json({
+        error: "ಅಮಾನ್ಯ ಅರ್ಜಿ ಸಂಖ್ಯೆ."
+      });
+    }
+
+    const record = findOne.get(id);
+    if (!record) {
+      return res.status(404).json({
+        error: "ಅರ್ಜಿ ಕಂಡುಬಂದಿಲ್ಲ."
+      });
+    }
+
+    if (record.status === "PAID") {
+      return res.json({
+        success: true,
+        registrationNumber: record.registration_no
+      });
+    }
+
+    if (
+      !record.razorpay_order_id ||
+      record.razorpay_order_id !== razorpay_order_id ||
+      typeof razorpay_payment_id !== "string" ||
+      typeof razorpay_signature !== "string"
+    ) {
+      return res.status(400).json({
+        error: "ಪಾವತಿ ವಿವರಗಳು ಹೊಂದಿಕೆಯಾಗುತ್ತಿಲ್ಲ."
+      });
+    }
+
+    const expected = crypto
+      .createHmac(
+        "sha256",
+        process.env.RAZORPAY_KEY_SECRET
+      )
+      .update(
+        record.razorpay_order_id + "|" +
+        razorpay_payment_id
+      )
+      .digest("hex");
+
+    const a = Buffer.from(expected, "hex");
+    const b = Buffer.from(razorpay_signature, "hex");
+
+    if (
+      a.length !== b.length ||
+      !crypto.timingSafeEqual(a, b)
+    ) {
+      return res.status(400).json({
+        error: "ಪಾವತಿ signature ಪರಿಶೀಲನೆ ವಿಫಲವಾಗಿದೆ."
+      });
+    }
+
+    const payment = await razorpay.payments.fetch(
+      razorpay_payment_id
+    );
+
+    if (
+      payment.order_id !== record.razorpay_order_id ||
+      payment.amount !== 25000 ||
+      payment.currency !== "INR" ||
+      payment.status !== "captured"
+    ) {
+      return res.status(409).json({
+        error: "ಪಾವತಿ ಇನ್ನೂ ಪೂರ್ಣವಾಗಿ ದೃಢಪಟ್ಟಿಲ್ಲ."
+      });
+    }
+
+    const regNo =
+      `STU${new Date().getFullYear()}` +
+      String(id).padStart(5, "0");
+
+    const update = db.prepare(`
+      UPDATE registrations
+      SET status = 'PAID',
+          registration_no = ?,
+          razorpay_payment_id = ?,
+          approved_at = CURRENT_TIMESTAMP
+      WHERE id = ? AND status = 'PENDING'
+    `);
+
+    const result = update.run(
+      regNo,
+      razorpay_payment_id,
+      id
+    );
+
+    if (result.changes === 0) {
+      const latest = findOne.get(id);
+      if (latest.status === "PAID") {
+        return res.json({
+          success: true,
+          registrationNumber: latest.registration_no
+        });
+      }
+
+      return res.status(409).json({
+        error: "ನೋಂದಣಿಯ ಸ್ಥಿತಿ ಬದಲಾಗಿದೆ. ಮತ್ತೆ ಪರಿಶೀಲಿಸಿ."
+      });
+    }
+
+    res.json({
+      success: true,
+      registrationNumber: regNo,
+      message: "ಪಾವತಿ ದೃಢಪಟ್ಟಿದೆ. ನೋಂದಣಿ ಯಶಸ್ವಿಯಾಗಿದೆ."
+    });
+  } catch (error) {
+    console.error("Payment verification failed:", error.message);
+    res.status(500).json({
+      error: "ಪಾವತಿ ಪರಿಶೀಲಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ಸಹಾಯಕ್ಕಾಗಿ ಸಂಪರ್ಕಿಸಿ."
+    });
+  }
+});
   try {
     const {
       studentName,
