@@ -1,4 +1,6 @@
-require("dotenv").config();
+app.listen(port, "0.0.0.0", () => {
+  console.log(`Student registration app running on port ${port}`);
+});
 const form = document.querySelector("#form");
 const submit = document.querySelector("#submit");
 const payment = document.querySelector("#payment");
