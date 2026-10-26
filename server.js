@@ -1,21 +1,6 @@
 app.listen(port, "0.0.0.0", () => {
   console.log(`Student registration app running on port ${port}`);
 });
-const form = document.querySelector("#form");
-const submit = document.querySelector("#submit");
-const payment = document.querySelector("#payment");
-const result = document.querySelector("#result");
-
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  if (!form.reportValidity()) return;
-
-  submit.disabled = true;
-  submit.textContent = "ಪಾವತಿ ಸಿದ್ಧಪಡಿಸಲಾಗುತ್ತಿದೆ…";
-  result.classList.add("hidden");
-
-  try {
-    const payload = Object.fromEntries(new FormData(form).entries());
 
     const response = await fetch("/api/register", {
       method: "POST",
