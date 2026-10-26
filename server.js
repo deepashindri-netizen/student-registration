@@ -1,4 +1,4 @@
-```javascript
+require("dotenv").config();
 const form = document.querySelector("#form");
 const submit = document.querySelector("#submit");
 const payment = document.querySelector("#payment");
