@@ -1,92 +1,309 @@
-<div id="message" role="status" aria-live="polite"></div>
 
-<script>
-const form = document.getElementById("registrationForm");
-const message = document.getElementById("message");
-const button = form.querySelector('[type="submit"]');
+<!doctype html>
+<html lang="kn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-form.addEventListener("submit", async function(event) {
-  event.preventDefault();
+  <title>Student Registration</title>
 
-  if (!window.Razorpay) {
-    message.textContent = "ಪಾವತಿ ಪುಟ ಲೋಡ್ ಆಗಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.";
-    return;
-  }
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
-  button.disabled = true;
-  message.textContent = "ಪಾವತಿ ವಿವರಗಳನ್ನು ಸಿದ್ಧಪಡಿಸಲಾಗುತ್ತಿದೆ...";
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-  try {
-    const data = Object.fromEntries(new FormData(form).entries());
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f3f6fb;
+      color: #172033;
+    }
 
-    const response = await fetch("/api/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    });
+    main {
+      max-width: 560px;
+      margin: 36px auto;
+      padding: 24px;
+      background: white;
+      border-radius: 14px;
+      box-shadow: 0 8px 28px #15294b14;
+    }
 
-    const order = await response.json();
-    if (!response.ok) throw new Error(order.error || "Order ರಚಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ.");
+    h1 {
+      margin-top: 0;
+      font-size: 26px;
+    }
 
-    const checkout = new Razorpay({
-      key: order.keyId,
-      amount: order.amount,
-      currency: order.currency,
-      name: order.merchantName,
-      description: "ವಿದ್ಯಾರ್ಥಿ ನೋಂದಣಿ ಶುಲ್ಕ",
-      order_id: order.orderId,
-      prefill: {
-        name: data.studentName,
-        contact: data.mobile
-      },
-      handler: async function(payment) {
-        message.textContent = "ಪಾವತಿಯನ್ನು ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ...";
+    p {
+      line-height: 1.5;
+    }
 
-        try {
-          const verifyResponse = await fetch("/api/payments/verify", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              registrationId: order.registrationId,
-              razorpay_order_id: payment.razorpay_order_id,
-              razorpay_payment_id: payment.razorpay_payment_id,
-              razorpay_signature: payment.razorpay_signature
-            })
-          });
+    label {
+      display: block;
+      margin: 15px 0 6px;
+      font-weight: 600;
+    }
 
-          const result = await verifyResponse.json();
-          if (!verifyResponse.ok) {
-            throw new Error(result.error || "ಪಾವತಿ ದೃಢೀಕರಿಸಲಾಗಲಿಲ್ಲ.");
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 22px;
+      padding: 13px;
+      border: 0;
+      border-radius: 8px;
+      background: #175cd3;
+      color: white;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: .6;
+      cursor: wait;
+    }
+
+    #message {
+      margin-top: 18px;
+      white-space: pre-wrap;
+    }
+
+    .success {
+      color: #087443;
+      font-weight: 700;
+    }
+
+    .error {
+      color: #b42318;
+    }
+
+    .fee {
+      background: #eff6ff;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 16px 0;
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <h1>ವಿದ್ಯಾರ್ಥಿ ನೋಂದಣಿ</h1>
+
+    <p>
+      ದಯವಿಟ್ಟು ಕೆಳಗಿನ ವಿವರಗಳನ್ನು ಭರ್ತಿ ಮಾಡಿ.
+      ಪಾವತಿ ಯಶಸ್ವಿಯಾಗಿ ದೃಢಪಟ್ಟ ನಂತರ Registration Number ನೀಡಲಾಗುತ್ತದೆ.
+    </p>
+
+    <div class="fee">
+      ನೋಂದಣಿ ಶುಲ್ಕ: <strong>₹250</strong>
+    </div>
+
+    <form id="registrationForm">
+
+      <label for="studentName">ವಿದ್ಯಾರ್ಥಿಯ ಹೆಸರು</label>
+      <input
+        id="studentName"
+        name="studentName"
+        maxlength="120"
+        required
+      >
+
+      <label for="fatherName">ತಂದೆಯ ಹೆಸರು</label>
+      <input
+        id="fatherName"
+        name="fatherName"
+        maxlength="120"
+        required
+      >
+
+      <label for="dob">ಜನ್ಮ ದಿನಾಂಕ</label>
+      <input
+        id="dob"
+        name="dob"
+        type="date"
+        required
+      >
+
+      <label for="mobile">ಮೊಬೈಲ್ ಸಂಖ್ಯೆ</label>
+      <input
+        id="mobile"
+        name="mobile"
+        type="tel"
+        inputmode="numeric"
+        pattern="[6-9][0-9]{9}"
+        maxlength="10"
+        placeholder="10 ಅಂಕಿಗಳ ಮೊಬೈಲ್ ಸಂಖ್ಯೆ"
+        required
+      >
+
+      <button id="payButton" type="submit">
+        ₹250 ಪಾವತಿಸಿ ನೋಂದಣಿ ಮಾಡಿ
+      </button>
+
+    </form>
+
+    <div id="message" role="status" aria-live="polite"></div>
+  </main>
+
+  <script>
+    const form = document.getElementById("registrationForm");
+    const payButton = document.getElementById("payButton");
+    const message = document.getElementById("message");
+
+    function showMessage(text, className = "") {
+      message.className = className;
+      message.textContent = text;
+    }
+
+    form.addEventListener("submit", async function(event) {
+      event.preventDefault();
+
+      if (!form.reportValidity()) return;
+
+      payButton.disabled = true;
+      showMessage("ಪಾವತಿ ವಿವರಗಳನ್ನು ಸಿದ್ಧಪಡಿಸಲಾಗುತ್ತಿದೆ...");
+
+      try {
+        const formData = new FormData(form);
+
+        const student = {
+          studentName: String(formData.get("studentName")).trim(),
+          fatherName: String(formData.get("fatherName")).trim(),
+          dob: String(formData.get("dob")),
+          mobile: String(formData.get("mobile")).trim()
+        };
+
+        const orderResponse = await fetch("/api/register", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(student)
+        });
+
+        const orderData = await orderResponse.json();
+
+        if (!orderResponse.ok) {
+          throw new Error(
+            orderData.error || "Order ಸೃಷ್ಟಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ."
+          );
+        }
+
+        if (!window.Razorpay) {
+          throw new Error(
+            "Razorpay Checkout load ಆಗಿಲ್ಲ. Internet ಪರಿಶೀಲಿಸಿ."
+          );
+        }
+
+        const checkout = new Razorpay({
+          key: orderData.keyId,
+          amount: orderData.amount,
+          currency: orderData.currency,
+          name: orderData.merchantName,
+          description: "Student Registration Fee",
+          order_id: orderData.orderId,
+
+          prefill: {
+            name: student.studentName,
+            contact: student.mobile
+          },
+
+          theme: {
+            color: "#175cd3"
+          },
+
+          handler: async function(paymentResponse) {
+            showMessage("ಪಾವತಿಯನ್ನು ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ...");
+
+            try {
+              const verifyResponse = await fetch(
+                "/api/payments/verify",
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json"
+                  },
+                  body: JSON.stringify({
+                    registrationId: orderData.registrationId,
+                    razorpay_order_id:
+                      paymentResponse.razorpay_order_id,
+                    razorpay_payment_id:
+                      paymentResponse.razorpay_payment_id,
+                    razorpay_signature:
+                      paymentResponse.razorpay_signature
+                  })
+                }
+              );
+
+              const verifyData = await verifyResponse.json();
+
+              if (!verifyResponse.ok || !verifyData.success) {
+                throw new Error(
+                  verifyData.error || "ಪಾವತಿ ಪರಿಶೀಲನೆ ವಿಫಲವಾಗಿದೆ."
+                );
+              }
+
+              showMessage(
+                "ನೋಂದಣಿ ಯಶಸ್ವಿಯಾಗಿದೆ!\nRegistration Number: " +
+                verifyData.registrationNumber,
+                "success"
+              );
+
+              form.reset();
+
+            } catch (error) {
+              showMessage(
+                error.message +
+                "\nRegistration ID: " +
+                orderData.registrationId,
+                "error"
+              );
+            } finally {
+              payButton.disabled = false;
+            }
+          },
+
+          modal: {
+            ondismiss: function() {
+              showMessage(
+                "Checkout ಮುಚ್ಚಲಾಗಿದೆ. ಪಾವತಿ ಮಾಡದಿದ್ದರೆ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ."
+              );
+
+              payButton.disabled = false;
+            }
           }
+        });
 
-          message.textContent =
-            "ನೋಂದಣಿ ಯಶಸ್ವಿಯಾಗಿದೆ! Registration Number: " +
-            result.registrationNumber;
-          form.reset();
-        } catch (error) {
-          message.textContent = error.message +
-            " ನಿಮ್ಮ ಪಾವತಿ ಸ್ಥಿತಿಯನ್ನು ಪರಿಶೀಲಿಸಲು ಸಹಾಯಕ್ಕಾಗಿ ಸಂಪರ್ಕಿಸಿ.";
-        }
-      },
-      modal: {
-        ondismiss: function() {
-          message.textContent =
-            "ಪಾವತಿ ಪೂರ್ಣಗೊಂಡಿಲ್ಲ ಅಥವಾ Checkout ಮುಚ್ಚಲಾಗಿದೆ. ಅಗತ್ಯವಿದ್ದರೆ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.";
-          button.disabled = false;
-        }
+        checkout.on("payment.failed", function(response) {
+          showMessage(
+            "ಪಾವತಿ ವಿಫಲವಾಗಿದೆ: " +
+            (response.error.description || "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ."),
+            "error"
+          );
+
+          payButton.disabled = false;
+        });
+
+        checkout.open();
+
+      } catch (error) {
+        showMessage(
+          error.message || "ಏನೋ ತಪ್ಪಾಗಿದೆ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+          "error"
+        );
+
+        payButton.disabled = false;
       }
     });
-
-    checkout.on("payment.failed", function() {
-      message.textContent =
-        "ಪಾವತಿ ವಿಫಲವಾಗಿದೆ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.";
-      button.disabled = false;
-    });
-
-    checkout.open();
-  } catch (error) {
-    message.textContent = "ದೋಷ: " + error.message;
-    button.disabled = false;
-  }
-});
-</script>
+  </script>
+</body>
+</html>
