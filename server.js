@@ -277,11 +277,9 @@ app.get("/api/registration/:id", (req, res) => {
   });
 });
 
-app.get("/api/health", (req, res) => {
-  res.json({ ok: true });
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
-
-const port = Number(process.env.PORT || 3000);
 
 app.listen(port, () => {
   console.log(`Student registration app running on port ${port}`);
