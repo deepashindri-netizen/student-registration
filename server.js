@@ -281,6 +281,9 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-app.listen(port, () => {
+
+const port = Number(process.env.PORT || 10000);
+
+app.listen(port, "0.0.0.0", () => {
   console.log(`Student registration app running on port ${port}`);
 });
