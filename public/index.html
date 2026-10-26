@@ -5,10 +5,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Student Registration</title>
+  <title>RABKAVI BANAHATTI GK COMPETITION</title>
 
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-<script src="app.js"></script>
 
   <style>
     * {
@@ -17,52 +16,103 @@
 
     body {
       margin: 0;
+      padding: 16px;
       font-family: Arial, sans-serif;
-      background: #f3f6fb;
+      background: #f0f5ff;
       color: #172033;
     }
 
     main {
       max-width: 560px;
-      margin: 36px auto;
+      margin: 20px auto;
       padding: 24px;
       background: white;
-      border-radius: 14px;
-      box-shadow: 0 8px 28px #15294b14;
+      border-radius: 16px;
+      box-shadow: 0 8px 28px #15294b18;
+    }
+
+    .header {
+      text-align: center;
+      padding: 22px 12px;
+      margin-bottom: 22px;
+      background: linear-gradient(135deg, #12377a, #2563eb);
+      border-radius: 12px;
+      color: white;
+    }
+
+    .trophy {
+      font-size: 42px;
+      margin-bottom: 8px;
     }
 
     h1 {
-      margin-top: 0;
-      font-size: 26px;
+      margin: 0;
+      font-size: 27px;
+      line-height: 1.4;
+      overflow-wrap: anywhere;
     }
 
-    p {
-      line-height: 1.5;
+    h1 span {
+      display: block;
+      color: #ffdf75;
+      font-size: 24px;
+      margin-top: 5px;
+    }
+
+    .subtitle {
+      margin: 12px 0 0;
+      font-size: 16px;
+    }
+
+    .instructions {
+      line-height: 1.7;
+      text-align: center;
+    }
+
+    .fee {
+      background: #fff7df;
+      border: 1px solid #f1d47c;
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      margin: 20px 0;
+      font-size: 18px;
+    }
+
+    .fee strong {
+      color: #1746a2;
+      font-size: 24px;
     }
 
     label {
       display: block;
-      margin: 15px 0 6px;
-      font-weight: 600;
+      margin: 16px 0 7px;
+      font-weight: 700;
     }
 
     input {
       width: 100%;
-      padding: 12px;
+      padding: 13px;
       border: 1px solid #cbd5e1;
       border-radius: 8px;
       font-size: 16px;
+      background: white;
+    }
+
+    input:focus {
+      outline: 2px solid #93b4ff;
+      border-color: #175cd3;
     }
 
     button {
       width: 100%;
-      margin-top: 22px;
-      padding: 13px;
+      margin-top: 24px;
+      padding: 15px;
       border: 0;
-      border-radius: 8px;
+      border-radius: 9px;
       background: #175cd3;
       color: white;
-      font-size: 16px;
+      font-size: 17px;
       font-weight: 700;
       cursor: pointer;
     }
@@ -74,7 +124,9 @@
 
     #message {
       margin-top: 18px;
+      line-height: 1.7;
       white-space: pre-wrap;
+      overflow-wrap: anywhere;
     }
 
     .success {
@@ -86,35 +138,70 @@
       color: #b42318;
     }
 
-    .fee {
-      background: #eff6ff;
-      padding: 12px;
-      border-radius: 8px;
-      margin: 16px 0;
+    .note {
+      color: #5b6577;
+      font-size: 13px;
+      text-align: center;
+      line-height: 1.6;
+      margin-top: 18px;
+    }
+
+    footer {
+      text-align: center;
+      color: #64748b;
+      font-size: 12px;
+      margin-top: 22px;
+    }
+
+    @media (max-width: 420px) {
+      main {
+        padding: 16px;
+      }
+
+      h1 {
+        font-size: 23px;
+      }
+
+      h1 span {
+        font-size: 21px;
+      }
     }
   </style>
 </head>
 
 <body>
   <main>
-    <h1>ವಿದ್ಯಾರ್ಥಿ ನೋಂದಣಿ</h1>
+    <header class="header">
+      <div class="trophy" aria-hidden="true">🏆</div>
 
-    <p>
-      ದಯವಿಟ್ಟು ಕೆಳಗಿನ ವಿವರಗಳನ್ನು ಭರ್ತಿ ಮಾಡಿ.
-      ಪಾವತಿ ಯಶಸ್ವಿಯಾಗಿ ದೃಢಪಟ್ಟ ನಂತರ Registration Number ನೀಡಲಾಗುತ್ತದೆ.
+      <h1>
+        RABKAVI BANAHATTI
+        <span>GK COMPETITION</span>
+      </h1>
+
+      <p class="subtitle">STUDENT REGISTRATION</p>
+    </header>
+
+    <p class="instructions">
+      ಸಾಮಾನ್ಯ ಜ್ಞಾನ ಸ್ಪರ್ಧೆಯಲ್ಲಿ ಭಾಗವಹಿಸಲು
+      ಕೆಳಗಿನ ವಿವರಗಳನ್ನು ಸರಿಯಾಗಿ ಭರ್ತಿ ಮಾಡಿ.
+      ಪಾವತಿ ಯಶಸ್ವಿಯಾಗಿ ದೃಢಪಟ್ಟ ನಂತರವೇ
+      ನೋಂದಣಿ ಸಂಖ್ಯೆ ನೀಡಲಾಗುತ್ತದೆ.
     </p>
 
     <div class="fee">
-      ನೋಂದಣಿ ಶುಲ್ಕ: <strong>₹250</strong>
+      ನೋಂದಣಿ ಶುಲ್ಕ<br>
+      <strong>₹250</strong>
     </div>
 
     <form id="registrationForm">
-
-      <label for="studentName">ವಿದ್ಯಾರ್ಥಿಯ ಹೆಸರು</label>
+      <label for="studentName">ವಿದ್ಯಾರ್ಥಿಯ ಪೂರ್ಣ ಹೆಸರು</label>
       <input
         id="studentName"
         name="studentName"
+        type="text"
         maxlength="120"
+        autocomplete="name"
         required
       >
 
@@ -122,6 +209,7 @@
       <input
         id="fatherName"
         name="fatherName"
+        type="text"
         maxlength="120"
         required
       >
@@ -141,6 +229,7 @@
         type="tel"
         inputmode="numeric"
         pattern="[6-9][0-9]{9}"
+        minlength="10"
         maxlength="10"
         placeholder="10 ಅಂಕಿಗಳ ಮೊಬೈಲ್ ಸಂಖ್ಯೆ"
         required
@@ -149,10 +238,18 @@
       <button id="payButton" type="submit">
         ₹250 ಪಾವತಿಸಿ ನೋಂದಣಿ ಮಾಡಿ
       </button>
-
     </form>
 
     <div id="message" role="status" aria-live="polite"></div>
+
+    <p class="note">
+      ದಯವಿಟ್ಟು ನಿಮ್ಮ ವಿವರಗಳನ್ನು ಪರಿಶೀಲಿಸಿ.
+      ಪಾವತಿ ದೃಢೀಕರಣದ ನಂತರ ನೋಂದಣಿ ಸಂಖ್ಯೆ ಲಭ್ಯವಾಗುತ್ತದೆ.
+    </p>
+
+    <footer>
+      RABKAVI BANAHATTI GK COMPETITION
+    </footer>
   </main>
 
   <script>
@@ -201,16 +298,16 @@
 
         if (!window.Razorpay) {
           throw new Error(
-            "Razorpay Checkout load ಆಗಿಲ್ಲ. Internet ಪರಿಶೀಲಿಸಿ."
+            "Razorpay Checkout ಲೋಡ್ ಆಗಿಲ್ಲ. Internet ಪರಿಶೀಲಿಸಿ."
           );
         }
 
-        const checkout = new Razorpay({
+        const checkout = new window.Razorpay({
           key: orderData.keyId,
           amount: orderData.amount,
           currency: orderData.currency,
-          name: orderData.merchantName,
-          description: "Student Registration Fee",
+          name: orderData.merchantName || "RABKAVI BANAHATTI GK COMPETITION",
+          description: "GK Competition Registration Fee",
           order_id: orderData.orderId,
 
           prefill: {
@@ -264,8 +361,8 @@
             } catch (error) {
               showMessage(
                 error.message +
-                "\nRegistration ID: " +
-                orderData.registrationId,
+                "\nದಯವಿಟ್ಟು ನಿಮ್ಮ ಪಾವತಿ ವಿವರಗಳನ್ನು ಉಳಿಸಿಕೊಳ್ಳಿ. " +
+                "ಮತ್ತೆ ಪಾವತಿಸುವ ಮೊದಲು ಸಹಾಯ ಪಡೆಯಿರಿ.",
                 "error"
               );
             } finally {
@@ -276,7 +373,7 @@
           modal: {
             ondismiss: function() {
               showMessage(
-                "Checkout ಮುಚ್ಚಲಾಗಿದೆ. ಪಾವತಿ ಮಾಡದಿದ್ದರೆ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ."
+                "Checkout ಮುಚ್ಚಲಾಗಿದೆ. ಪಾವತಿ ಪೂರ್ಣಗೊಳ್ಳದಿದ್ದರೆ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ."
               );
 
               payButton.disabled = false;
@@ -287,7 +384,12 @@
         checkout.on("payment.failed", function(response) {
           showMessage(
             "ಪಾವತಿ ವಿಫಲವಾಗಿದೆ: " +
-            (response.error.description || "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ."),
+            (
+              response.error &&
+              response.error.description
+                ? response.error.description
+                : "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ."
+            ),
             "error"
           );
 
