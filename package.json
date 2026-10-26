@@ -11,4 +11,4 @@
     "helmet": "^8.0.0",
     "qrcode": "^1.5.4"
   "npm install razorpay"
-}
+} "razorpay": "^2.9.6"
