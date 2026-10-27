@@ -157,11 +157,11 @@ app.post("/api/payments/verify", async (req, res) => {
     }
 
     if (registration.status === "paid") {
-      return res.json({
-        success: true,
-        registrationNumber: registration.registrationNumber
-      });
-    }
+  return res.json({
+    success: true,
+    registrationNumber: registration.registrationNumber
+  });
+}
 
     const expectedSignature = crypto
       .createHmac("sha256", keySecret)
