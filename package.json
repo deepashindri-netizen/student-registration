@@ -9,10 +9,10 @@
     "dev": "node --watch server.js"
   },
   "dependencies": {
-    "better-sqlite3": "^11.8.1",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "helmet": "^8.0.0",
+    "pg": "^8.13.1",
     "qrcode": "^1.5.4",
     "razorpay": "^2.9.6"
   }
