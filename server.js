@@ -41,7 +41,10 @@ function getRazorpay() {
   }
 
   return {
-    client: new Razorpay({ key_id: keyId, key_secret: keySecret }),
+    client: new Razorpay({
+      key_id: keyId,
+      key_secret: keySecret
+    }),
     keyId,
     keySecret
   };
@@ -111,6 +114,7 @@ app.post("/api/register", async (req, res) => {
     }
   } catch (error) {
     console.error("Registration error:", error.message);
+
     return res.status(500).json({
       error: "ಪಾವತಿ ಸಿದ್ಧಪಡಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. Razorpay keys ಮತ್ತು settings ಪರಿಶೀಲಿಸಿ."
     });
@@ -154,6 +158,7 @@ app.post("/api/payments/verify", async (req, res) => {
 
     if (registration.status === "paid") {
       return res.json({
+        success: true,
         registrationNumber: registration.registrationNumber
       });
     }
@@ -203,9 +208,13 @@ app.post("/api/payments/verify", async (req, res) => {
       registration.id
     );
 
-    return res.json({ registrationNumber });
+    return res.json({
+      success: true,
+      registrationNumber
+    });
   } catch (error) {
     console.error("Payment verification error:", error.message);
+
     return res.status(500).json({
       error: "ಪಾವತಿ ಪರಿಶೀಲಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ."
     });
