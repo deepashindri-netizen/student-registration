@@ -5,7 +5,7 @@ const express = require("express");
 const helmet = require("helmet");
 const path = require("path");
 const crypto = require("crypto");
-const Database = require("better-sqlite3");
+const { Pool } = require("pg");
 const Razorpay = require("razorpay");
 
 const app = express();
@@ -15,22 +15,31 @@ app.use(helmet({ contentSecurityPolicy: false }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-const db = new Database("students.db");
+if (!process.env.DATABASE_URL) {
+  throw new Error("DATABASE_URL is not configured.");
+}
 
-db.exec(`
-  CREATE TABLE IF NOT EXISTS registrations (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    studentName TEXT NOT NULL,
-    fatherName TEXT NOT NULL,
-    dob TEXT NOT NULL,
-    mobile TEXT NOT NULL,
-    status TEXT NOT NULL DEFAULT 'pending',
-    razorpayOrderId TEXT,
-    paymentId TEXT,
-    registrationNumber TEXT,
-    createdAt TEXT DEFAULT CURRENT_TIMESTAMP
-  )
-`);
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
+});
+
+async function initializeDatabase() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS registrations (
+      id BIGSERIAL PRIMARY KEY,
+      "studentName" TEXT NOT NULL,
+      "fatherName" TEXT NOT NULL,
+      dob TEXT NOT NULL,
+      mobile TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'pending',
+      "razorpayOrderId" TEXT,
+      "paymentId" TEXT,
+      "registrationNumber" TEXT,
+      "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+}
 
 function getRazorpay() {
   const keyId = process.env.RAZORPAY_KEY_ID;
@@ -55,6 +64,8 @@ app.get("/", (req, res) => {
 });
 
 app.post("/api/register", async (req, res) => {
+  let registrationId;
+
   try {
     const { studentName, fatherName, dob, mobile } = req.body;
 
@@ -62,7 +73,7 @@ app.post("/api/register", async (req, res) => {
       !studentName?.trim() ||
       !fatherName?.trim() ||
       !dob ||
-      !/^[0-9]{10}$/.test(String(mobile || "").trim())
+      !/^[6-9][0-9]{9}$/.test(String(mobile || "").trim())
     ) {
       return res.status(400).json({
         error: "ದಯವಿಟ್ಟು ಎಲ್ಲಾ ವಿವರಗಳನ್ನು ಸರಿಯಾಗಿ ನಮೂದಿಸಿ."
@@ -71,52 +82,47 @@ app.post("/api/register", async (req, res) => {
 
     const { client, keyId } = getRazorpay();
 
-    const insert = db.prepare(`
-      INSERT INTO registrations
-      (studentName, fatherName, dob, mobile, status)
-      VALUES (?, ?, ?, ?, 'pending')
-    `);
-
-    const record = insert.run(
-      studentName.trim(),
-      fatherName.trim(),
-      dob,
-      String(mobile).trim()
+    const result = await pool.query(
+      `INSERT INTO registrations
+       ("studentName", "fatherName", dob, mobile, status)
+       VALUES ($1, $2, $3, $4, 'pending')
+       RETURNING id`,
+      [
+        studentName.trim(),
+        fatherName.trim(),
+        dob,
+        String(mobile).trim()
+      ]
     );
 
-    const registrationId = record.lastInsertRowid;
+    registrationId = result.rows[0].id;
 
-    try {
-      const order = await client.orders.create({
-        amount: 25000,
-        currency: "INR",
-        receipt: `student_${registrationId}`
-      });
+    const order = await client.orders.create({
+      amount: 25000,
+      currency: "INR",
+      receipt: `student_${registrationId}`
+    });
 
-      db.prepare(`
-        UPDATE registrations
-        SET razorpayOrderId = ?
-        WHERE id = ?
-      `).run(order.id, registrationId);
+    await pool.query(
+      `UPDATE registrations
+       SET "razorpayOrderId" = $1
+       WHERE id = $2`,
+      [order.id, registrationId]
+    );
 
-      return res.json({
-        registrationId,
-        orderId: order.id,
-        amount: order.amount,
-        currency: order.currency,
-        keyId,
-        merchantName: "Student Registration"
-      });
-    } catch (error) {
-      db.prepare("DELETE FROM registrations WHERE id = ?")
-        .run(registrationId);
-      throw error;
-    }
+    return res.json({
+      registrationId,
+      orderId: order.id,
+      amount: order.amount,
+      currency: order.currency,
+      keyId,
+      merchantName: "RABKAVI BANAHATTI GK COMPETITION"
+    });
   } catch (error) {
-    cconsole.error("Registration error:", error.message || error);
+    console.error("Registration error:", error.message || error);
 
     return res.status(500).json({
-      error: "ಪಾವತಿ ಸಿದ್ಧಪಡಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. Razorpay keys ಮತ್ತು settings ಪರಿಶೀಲಿಸಿ."
+      error: "ಪಾವತಿ ಸಿದ್ಧಪಡಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಸಹಾಯ ಪಡೆಯಿರಿ."
     });
   }
 });
@@ -143,25 +149,28 @@ app.post("/api/payments/verify", async (req, res) => {
 
     const { client, keySecret } = getRazorpay();
 
-    const registration = db.prepare(`
-      SELECT * FROM registrations WHERE id = ?
-    `).get(registrationId);
+    const result = await pool.query(
+      `SELECT * FROM registrations WHERE id = $1`,
+      [registrationId]
+    );
+
+    const registration = result.rows[0];
 
     if (
       !registration ||
       registration.razorpayOrderId !== razorpay_order_id
     ) {
       return res.status(400).json({
-        error: "Registration ಅಥವಾ order ಸರಿಯಾಗಿಲ್ಲ."
+        error: "ನೋಂದಣಿ ಅಥವಾ ಪಾವತಿ Order ದಾಖಲೆ ಸಿಗಲಿಲ್ಲ. ಮತ್ತೆ ಪಾವತಿಸಬೇಡಿ; ಸಹಾಯ ಪಡೆಯಿರಿ."
       });
     }
 
     if (registration.status === "paid") {
-  return res.json({
-    success: true,
-    registrationNumber: registration.registrationNumber
-  });
-}
+      return res.json({
+        success: true,
+        registrationNumber: registration.registrationNumber
+      });
+    }
 
     const expectedSignature = crypto
       .createHmac("sha256", keySecret)
@@ -189,23 +198,24 @@ app.post("/api/payments/verify", async (req, res) => {
       payment.status !== "captured"
     ) {
       return res.status(400).json({
-        error: "ಪಾವತಿ ಇನ್ನೂ ಯಶಸ್ವಿಯಾಗಿ ದೃಢಪಟ್ಟಿಲ್ಲ."
+        error: "ಪಾವತಿ Captured ಆಗಿರುವುದು ದೃಢಪಟ್ಟಿಲ್ಲ."
       });
     }
 
     const registrationNumber =
       `STU${new Date().getFullYear()}${String(registration.id).padStart(5, "0")}`;
 
-    db.prepare(`
-      UPDATE registrations
-      SET status = 'paid',
-          paymentId = ?,
-          registrationNumber = ?
-      WHERE id = ?
-    `).run(
-      razorpay_payment_id,
-      registrationNumber,
-      registration.id
+    await pool.query(
+      `UPDATE registrations
+       SET status = 'paid',
+           "paymentId" = $1,
+           "registrationNumber" = $2
+       WHERE id = $3`,
+      [
+        razorpay_payment_id,
+        registrationNumber,
+        registration.id
+      ]
     );
 
     return res.json({
@@ -213,30 +223,46 @@ app.post("/api/payments/verify", async (req, res) => {
       registrationNumber
     });
   } catch (error) {
-    console.error("Payment verification error:", error.message);
+    console.error("Payment verification error:", error.message || error);
 
     return res.status(500).json({
-      error: "ಪಾವತಿ ಪರಿಶೀಲಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ."
+      error: "ಪಾವತಿ ಪರಿಶೀಲಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಪಾವತಿಸಬೇಡಿ; ಸಹಾಯ ಪಡೆಯಿರಿ."
     });
   }
 });
 
-app.get("/api/registration/:id", (req, res) => {
-  const registration = db.prepare(`
-    SELECT id, studentName, status, registrationNumber
-    FROM registrations
-    WHERE id = ?
-  `).get(req.params.id);
+app.get("/api/registration/:id", async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT id, "studentName", status, "registrationNumber"
+       FROM registrations
+       WHERE id = $1`,
+      [req.params.id]
+    );
 
-  if (!registration) {
-    return res.status(404).json({
-      error: "ನೋಂದಣಿ ದಾಖಲೆ ಸಿಗಲಿಲ್ಲ."
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        error: "ನೋಂದಣಿ ದಾಖಲೆ ಸಿಗಲಿಲ್ಲ."
+      });
+    }
+
+    return res.json(result.rows[0]);
+  } catch (error) {
+    console.error("Registration lookup error:", error.message || error);
+
+    return res.status(500).json({
+      error: "ನೋಂದಣಿ ವಿವರಗಳನ್ನು ಪಡೆಯಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ."
     });
   }
-
-  return res.json(registration);
 });
 
-app.listen(port, "0.0.0.0", () => {
-  console.log(`Student registration app running on port ${port}`);
-});
+initializeDatabase()
+  .then(() => {
+    app.listen(port, "0.0.0.0", () => {
+      console.log("Student registration app running on port " + port);
+    });
+  })
+  .catch((error) => {
+    console.error("Database initialization error:", error.message || error);
+    process.exit(1);
+  });
