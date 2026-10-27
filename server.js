@@ -113,7 +113,7 @@ app.post("/api/register", async (req, res) => {
       throw error;
     }
   } catch (error) {
-    console.error("Registration error:", error.message);
+    cconsole.error("Registration error:", error.message || error);
 
     return res.status(500).json({
       error: "ಪಾವತಿ ಸಿದ್ಧಪಡಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. Razorpay keys ಮತ್ತು settings ಪರಿಶೀಲಿಸಿ."
