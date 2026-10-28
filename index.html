@@ -1,30 +1,132 @@
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="kn">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ವಿದ್ಯಾರ್ಥಿ ನೋಂದಣಿ</title><link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ವಿದ್ಯಾರ್ಥಿ ನೋಂದಣಿ ಪೋರ್ಟಲ್</title>
+
+  <link rel="stylesheet" href="style.css">
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
+
 <body>
-<script src="app.js"></script>
-<header class="top"><div class="brand"><span class="cap">🎓</span><div><b>ವಿದ್ಯಾರ್ಥಿ ನೋಂದಣಿ ಪೋರ್ಟಲ್</b><small>Student Registration Portal</small></div></div><span class="tag">ಸುರಕ್ಷಿತ ನೋಂದಣಿ</span></header>
-<main class="wrap">
-<section class="intro"><p class="overline">STUDENT REGISTRATION</p><h1>ನಿಮ್ಮ ಭವಿಷ್ಯಕ್ಕೆ<br>ಇಂದು ಒಂದು ಹೆಜ್ಜೆ</h1><p>ವಿದ್ಯಾರ್ಥಿ ವಿವರಗಳನ್ನು ಭರ್ತಿ ಮಾಡಿ, ₹250 ನೋಂದಣಿ ಶುಲ್ಕ ಪಾವತಿಸಿ.</p></section>
-<section class="panel">
-<h2>ನೋಂದಣಿ ಅರ್ಜಿ <small>Registration Form</small></h2>
-<form id="form">
-<label>ವಿದ್ಯಾರ್ಥಿಯ ಹೆಸರು (Student Name)<input name="studentName" required maxlength="120" placeholder="ಪೂರ್ಣ ಹೆಸರು"></label>
-<label>ತಂದೆಯ ಹೆಸರು (Father Name)<input name="fatherName" required maxlength="120" placeholder="ತಂದೆಯ ಪೂರ್ಣ ಹೆಸರು"></label>
-<label>ಜನ್ಮ ದಿನಾಂಕ (Date of Birth)<input name="dob" type="date" required></label>
-<label>ಮೊಬೈಲ್ ಸಂಖ್ಯೆ (Mobile Number)<input name="mobile" type="tel" inputmode="numeric" pattern="[6-9][0-9]{9}" maxlength="10" required placeholder="10 ಅಂಕಿಗಳ ಸಂಖ್ಯೆ"></label>
-<label>UPI Transaction ID (ಪಾವತಿ ಮಾಡಿದ ನಂತರ)<input name="upiTxnRef" maxlength="100" placeholder="Transaction reference / UTR"></label>
-<div class="fee"><div><span>ನೋಂದಣಿ ಶುಲ್ಕ</span><strong>₹250</strong></div><span>UPI · QR Code</span></div>
-<button type="submit" id="submit">UPI ಪಾವತಿ ಮುಂದುವರಿಸಿ</button>
-<p class="hint">ಪಾವತಿ ದೃಢೀಕರಣವನ್ನು Admin ಪರಿಶೀಲಿಸುತ್ತಾರೆ. ದೃಢೀಕರಣದ ನಂತರವೇ Registration Number ನೀಡಲಾಗುತ್ತದೆ.</p>
-</form>
-<div id="payment" class="payment hidden"><h3>UPI ಮೂಲಕ ಪಾವತಿ ಮಾಡಿ</h3><p id="paymentNote"></p><img id="qr" alt="UPI QR code"><a id="upiLink" class="button" href="#">UPI App ತೆರೆಯಿರಿ</a><p class="hint">ಪಾವತಿಸಿದ ನಂತರ Transaction ID ಅನ್ನು ಫಾರ್ಮ್‌ನಲ್ಲಿ ನಮೂದಿಸಿ. ಈ ವೆಬ್‌ಸೈಟ್ ಸ್ವಯಂಚಾಲಿತ ಬ್ಯಾಂಕ್ ದೃಢೀಕರಣ ಹೊಂದಿಲ್ಲ; Admin ಪಾವತಿಯನ್ನು ಪರಿಶೀಲಿಸುತ್ತಾರೆ.</p></div>
-<div id="result" class="result hidden" aria-live="polite"></div>
-</section>
-<section class="features"><article><span>🔐</span><b>ಸುರಕ್ಷಿತ ಮಾಹಿತಿ</b><p>ಅಗತ್ಯ ನೋಂದಣಿ ವಿವರಗಳಷ್ಟೇ ಸಂಗ್ರಹಿಸಲಾಗುತ್ತದೆ.</p></article><article><span>📱</span><b>SMS ದೃಢೀಕರಣ</b><p>ಪಾವತಿ ಪರಿಶೀಲನೆಯ ಬಳಿಕ ನೋಂದಣಿ ಸಂಖ್ಯೆ SMS ಮೂಲಕ.</p></article><article><span>🧾</span><b>ನೋಂದಣಿ ರಸೀದಿ</b><p>ನೋಂದಣಿ ವಿವರಗಳನ್ನು ಉಳಿಸಿ ಅಥವಾ Print ಮಾಡಿ.</p></article></section>
-</main><footer>ವಿದ್ಯಾರ್ಥಿ ನೋಂದಣಿ ಪೋರ್ಟಲ್ · ಸಹಾಯಕ್ಕಾಗಿ ನಿರ್ವಾಹಕರನ್ನು ಸಂಪರ್ಕಿಸಿ</footer>
-<script src="app.js"></script>
-</body></html>
+  <header class="top">
+    <div class="brand">
+      <span class="cap">🎓</span>
+      <div>
+        <b>ವಿದ್ಯಾರ್ಥಿ ನೋಂದಣಿ ಪೋರ್ಟಲ್</b>
+        <small>Student Registration Portal</small>
+      </div>
+    </div>
+    <span class="tag">ಸುರಕ್ಷಿತ ನೋಂದಣಿ</span>
+  </header>
+
+  <main class="wrap">
+    <section class="intro">
+      <p class="overline">STUDENT REGISTRATION</p>
+      <h1>ನಿಮ್ಮ ಭವಿಷ್ಯಕ್ಕೆ<br>ಇಂದು ಒಂದು ಹೆಜ್ಜೆ</h1>
+      <p>ವಿದ್ಯಾರ್ಥಿ ವಿವರಗಳನ್ನು ಭರ್ತಿ ಮಾಡಿ, ₹250 ನೋಂದಣಿ ಶುಲ್ಕ ಪಾವತಿಸಿ.</p>
+    </section>
+
+    <section class="panel">
+      <h2>ನೋಂದಣಿ ಅರ್ಜಿ <small>Registration Form</small></h2>
+
+      <form id="form">
+        <label>
+          ವಿದ್ಯಾರ್ಥಿಯ ಹೆಸರು (Student Name)
+          <input
+            type="text"
+            name="studentName"
+            required
+            maxlength="120"
+            placeholder="ಪೂರ್ಣ ಹೆಸರು"
+          >
+        </label>
+
+        <label>
+          ತಂದೆಯ ಹೆಸರು (Father Name)
+          <input
+            type="text"
+            name="fatherName"
+            required
+            maxlength="120"
+            placeholder="ತಂದೆಯ ಪೂರ್ಣ ಹೆಸರು"
+          >
+        </label>
+
+        <label>
+          ಜನ್ಮ ದಿನಾಂಕ (Date of Birth)
+          <input type="date" name="dob" required>
+        </label>
+
+        <label>
+          ಮೊಬೈಲ್ ಸಂಖ್ಯೆ (Mobile Number)
+          <input
+            type="tel"
+            name="mobile"
+            inputmode="numeric"
+            pattern="[6-9][0-9]{9}"
+            maxlength="10"
+            required
+            placeholder="10 ಅಂಕಿಗಳ ಸಂಖ್ಯೆ"
+          >
+        </label>
+
+        <label>
+          ಪರೀಕ್ಷೆಯ ವಿಧಾನ (Examination Mode)
+          <select name="examinationMode" required>
+            <option value="">ಪರೀಕ್ಷೆಯ ವಿಧಾನ ಆಯ್ಕೆಮಾಡಿ</option>
+            <option value="Online">Online (ಆನ್‌ಲೈನ್)</option>
+            <option value="Offline">Offline (ಆಫ್‌ಲೈನ್)</option>
+          </select>
+        </label>
+
+        <div class="fee">
+          <div>
+            <span>ನೋಂದಣಿ ಶುಲ್ಕ</span>
+            <strong>₹250</strong>
+          </div>
+          <span>Razorpay Secure Payment</span>
+        </div>
+
+        <button type="submit" id="submit">
+          ನೋಂದಣಿ ಮಾಡಿ ಪಾವತಿಸಿ
+        </button>
+
+        <p class="hint">
+          ಪಾವತಿ ಪೂರ್ಣಗೊಂಡ ನಂತರ ನಿಮ್ಮ ನೋಂದಣಿ ಸಂಖ್ಯೆಯನ್ನು ತೋರಿಸಲಾಗುತ್ತದೆ.
+        </p>
+      </form>
+
+      <div id="result" class="result hidden" aria-live="polite"></div>
+    </section>
+
+    <section class="features">
+      <article>
+        <span>🔐</span>
+        <b>ಸುರಕ್ಷಿತ ಮಾಹಿತಿ</b>
+        <p>ಅಗತ್ಯ ನೋಂದಣಿ ವಿವರಗಳನ್ನು ಮಾತ್ರ ಸಂಗ್ರಹಿಸಲಾಗುತ್ತದೆ.</p>
+      </article>
+
+      <article>
+        <span>💳</span>
+        <b>ಸುರಕ್ಷಿತ ಪಾವತಿ</b>
+        <p>Razorpay ಮೂಲಕ ನೋಂದಣಿ ಶುಲ್ಕ ಪಾವತಿಸಿ.</p>
+      </article>
+
+      <article>
+        <span>🧾</span>
+        <b>ನೋಂದಣಿ ಸಂಖ್ಯೆ</b>
+        <p>ಪಾವತಿ ದೃಢಪಟ್ಟ ನಂತರ ನೋಂದಣಿ ಸಂಖ್ಯೆ ದೊರೆಯುತ್ತದೆ.</p>
+      </article>
+    </section>
+  </main>
+
+  <footer>
+    ವಿದ್ಯಾರ್ಥಿ ನೋಂದಣಿ ಪೋರ್ಟಲ್ · ಸಹಾಯಕ್ಕಾಗಿ ನಿರ್ವಾಹಕರನ್ನು ಸಂಪರ್ಕಿಸಿ
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
