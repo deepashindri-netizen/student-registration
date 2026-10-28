@@ -4,96 +4,103 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Student Registration | RABKAVI BANAHATTI GK COMPETITION</title>
-
+  <title>ವಿದ್ಯಾರ್ಥಿ ನೋಂದಣಿ | Student Registration</title>
   <link rel="stylesheet" href="style.css">
-
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script src="app.js" defer></script>
 </head>
-
 <body>
   <header class="top">
-    <div class="brand">RABKAVI BANAHATTI GK COMPETITION</div>
-    <p class="intro">ವಿದ್ಯಾರ್ಥಿಗಳ ನೋಂದಣಿ ಅರ್ಜಿ</p>
+    <div class="brand">Student Registration</div>
+    <p>ವಿದ್ಯಾರ್ಥಿ ನೋಂದಣಿ ಅರ್ಜಿ</p>
   </header>
 
   <main class="panel">
     <h1>ವಿದ್ಯಾರ್ಥಿ ನೋಂದಣಿ</h1>
-    <p>ದಯವಿಟ್ಟು ನಿಮ್ಮ ವಿವರಗಳನ್ನು ಸರಿಯಾಗಿ ಭರ್ತಿ ಮಾಡಿ.</p>
+    <p>Student Registration Form</p>
 
     <form id="form">
-      <label for="studentName">ವಿದ್ಯಾರ್ಥಿಯ ಪೂರ್ಣ ಹೆಸರು</label>
-      <input
-        type="text"
-        id="studentName"
-        name="studentName"
-        placeholder="ವಿದ್ಯಾರ್ಥಿಯ ಹೆಸರು"
-        required
-      >
+      <label for="studentName">ವಿದ್ಯಾರ್ಥಿಯ ಹೆಸರು / Student Name</label>
+      <input id="studentName" name="studentName" type="text" required>
 
-      <label for="fatherName">ತಂದೆಯ ಹೆಸರು</label>
-      <input
-        type="text"
-        id="fatherName"
-        name="fatherName"
-        placeholder="ತಂದೆಯ ಹೆಸರು"
-        required
-      >
+      <label for="fatherName">ತಂದೆಯ ಹೆಸರು / Father's Name</label>
+      <input id="fatherName" name="fatherName" type="text" required>
 
-      <label for="dob">ಜನ್ಮ ದಿನಾಂಕ</label>
-      <input
-        type="date"
-        id="dob"
-        name="dob"
-        required
-      >
+      <label for="dob">ಜನ್ಮ ದಿನಾಂಕ / Date of Birth</label>
+      <input id="dob" name="dob" type="date" required>
 
-      <label for="mobile">ಮೊಬೈಲ್ ಸಂಖ್ಯೆ</label>
-      <input
-        type="tel"
-        id="mobile"
-        name="mobile"
-        placeholder="10 ಅಂಕಿಯ ಮೊಬೈಲ್ ಸಂಖ್ಯೆ"
-        pattern="[6-9][0-9]{9}"
-        maxlength="10"
-        inputmode="numeric"
-        required
-      >
+      <label for="mobile">ಮೊಬೈಲ್ ಸಂಖ್ಯೆ / Mobile Number</label>
+      <input id="mobile" name="mobile" type="tel"
+             inputmode="numeric" pattern="[6-9][0-9]{9}"
+             maxlength="10" required>
 
-      <label for="examinationMode">ಪರೀಕ್ಷೆಯ ವಿಧಾನ</label>
-      <select
-        id="examinationMode"
-        name="examinationMode"
-        required
-      >
-        <option value="">ಪರೀಕ್ಷೆಯ ವಿಧಾನ ಆಯ್ಕೆಮಾಡಿ</option>
-        <option value="Online">Online (ಆನ್‌ಲೈನ್)</option>
-        <option value="Offline">Offline (ಆಫ್‌ಲೈನ್)</option>
+      <label for="qualification">ವಿದ್ಯಾರ್ಹತೆ / Qualification</label>
+      <select id="qualification" name="qualification" required>
+        <option value="">ಆಯ್ಕೆ ಮಾಡಿ / Select</option>
+        <option value="SSLC">SSLC</option>
+        <option value="PUC">PUC</option>
+        <option value="Diploma">Diploma</option>
+        <option value="Degree">Degree</option>
+        <option value="Postgraduate">Postgraduate</option>
+        <option value="Other">ಇತರೆ / Other</option>
       </select>
 
+      <label for="caste">ಜಾತಿ / Caste</label>
+      <input id="caste" name="caste" type="text" required>
+
+      <label for="gender">ಲಿಂಗ / Gender</label>
+      <select id="gender" name="gender" required>
+        <option value="">ಆಯ್ಕೆ ಮಾಡಿ / Select</option>
+        <option value="Male">ಪುರುಷ / Male</option>
+        <option value="Female">ಮಹಿಳೆ / Female</option>
+        <option value="Other">ಇತರೆ / Other</option>
+      </select>
+
+      <label for="aadhaar">ಆಧಾರ್ ಸಂಖ್ಯೆ / Aadhaar Number</label>
+      <input id="aadhaar" name="aadhaar" type="text"
+             inputmode="numeric" pattern="[0-9]{12}"
+             maxlength="12" autocomplete="off" required>
+      <small>ಸುರಕ್ಷತೆಗಾಗಿ ಸರ್ವರ್‌ನಲ್ಲಿ ಕೊನೆಯ 4 ಅಂಕೆಗಳು ಮಾತ್ರ ಉಳಿಸಲಾಗುತ್ತದೆ.</small>
+
+      <label for="address">ಪೂರ್ಣ ವಿಳಾಸ / Full Address</label>
+      <textarea id="address" name="address" rows="3" required></textarea>
+
+      <label for="pincode">ಪಿನ್ ಕೋಡ್ / PIN Code</label>
+      <input id="pincode" name="pincode" type="text"
+             inputmode="numeric" pattern="[0-9]{6}"
+             maxlength="6" required>
+
+      <label for="examinationMode">ಪರೀಕ್ಷೆಯ ವಿಧಾನ / Examination Mode</label>
+      <select id="examinationMode" name="examinationMode" required>
+        <option value="Online">ಆನ್‌ಲೈನ್ / Online</option>
+        <option value="Offline">ಆಫ್‌ಲೈನ್ / Offline</option>
+      </select>
+
+      <label for="photo">ಫೋಟೋ ಅಪ್‌ಲೋಡ್ / Upload Photo</label>
+      <input id="photo" name="photo" type="file"
+             accept="image/jpeg,image/png,image/webp" required>
+      <small>JPG, PNG ಅಥವಾ WebP. ಗರಿಷ್ಠ 2 MB.</small>
+
+      <label for="signature">ಸಹಿ ಅಪ್‌ಲೋಡ್ / Upload Signature</label>
+      <input id="signature" name="signature" type="file"
+             accept="image/jpeg,image/png,image/webp" required>
+      <small>JPG, PNG ಅಥವಾ WebP. ಗರಿಷ್ಠ 2 MB.</small>
+
       <div class="fee">
-        <p>ನೋಂದಣಿ ಶುಲ್ಕ</p>
-        <h2>₹250</h2>
+        ನೋಂದಣಿ ಶುಲ್ಕ / Registration Fee: ₹250
       </div>
 
-      <button type="submit" id="submit">
-        ನೋಂದಣಿ ಮಾಡಿ ಪಾವತಿಸಿ
+      <button id="submit" type="submit">
+        ನೋಂದಣಿ ಮಾಡಿ ಪಾವತಿಸಿ / Register & Pay
       </button>
-
-      <p id="result" class="result hidden" role="status"></p>
     </form>
 
-    <p class="hint">
-      ಪಾವತಿ ಪೂರ್ಣಗೊಂಡ ನಂತರ ನಿಮ್ಮ ನೋಂದಣಿ ಸಂಖ್ಯೆಯನ್ನು ತೋರಿಸಲಾಗುತ್ತದೆ.
-    </p>
+    <div id="result" class="result hidden" role="status"
+         aria-live="polite"></div>
   </main>
 
   <footer>
-    <p>RABKAVI BANAHATTI GK COMPETITION</p>
+    <p>ವಿದ್ಯಾರ್ಥಿ ನೋಂದಣಿ ವ್ಯವಸ್ಥೆ / Student Registration System</p>
   </footer>
-
-  <script src="app.js"></script>
 </body>
 </html>
-
