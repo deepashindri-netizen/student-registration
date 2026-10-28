@@ -35,3 +35,14 @@ button:disabled{opacity:.6;cursor:wait}
 footer{text-align:center;color:#8792a5;font-size:12px;padding:20px}
 .hidden{display:none!important}
 @media(max-width:700px){.top{padding:13px 16px}.brand b{font-size:15px}.tag{display:none}.wrap{margin:20px auto}.features{grid-template-columns:1fr}.intro h1{font-size:32px}.fee{align-items:flex-start;flex-direction:column}}
+body,
+input,
+select,
+textarea,
+button {
+  font-family: 'Noto Sans Kannada', sans-serif;
+}
+
+h1, h2, h3, h4, p, label {
+  font-family: 'Noto Sans Kannada', sans-serif;
+}
