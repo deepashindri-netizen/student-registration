@@ -1,5 +1,85 @@
-index.html
-manifest.json
-service-worker.js
-icon-192.png
-icon-512.png
+
+<!doctype html>
+<html lang="kn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ವಿದ್ಯಾರ್ಥಿ ನೋಂದಣಿ ಪೋರ್ಟಲ್</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <span class="cap">🎓</span>
+      <div>
+        <b>ವಿದ್ಯಾರ್ಥಿ ನೋಂದಣಿ ಪೋರ್ಟಲ್</b>
+        <small>Student Registration Portal</small>
+      </div>
+    </div>
+    <span class="tag">ಸುರಕ್ಷಿತ ನೋಂದಣಿ</span>
+  </header>
+
+  <main class="wrap">
+    <section class="intro">
+      <p class="overline">STUDENT REGISTRATION</p>
+      <h1>ನಿಮ್ಮ ಭವಿಷ್ಯಕ್ಕೆ<br>ಇಂದು ಒಂದು ಹೆಜ್ಜೆ</h1>
+      <p>ವಿದ್ಯಾರ್ಥಿಯ ವಿವರಗಳನ್ನು ಭರ್ತಿ ಮಾಡಿ, ₹250 ನೋಂದಣಿ ಶುಲ್ಕ ಪಾವತಿಸಿ.</p>
+    </section>
+
+    <section class="panel">
+      <h2>ನೋಂದಣಿ ಅರ್ಜಿ <small>Registration Form</small></h2>
+
+      <form id="form">
+        <label>ವಿದ್ಯಾರ್ಥಿಯ ಹೆಸರು
+          <input name="studentName" required maxlength="120" placeholder="ಪೂರ್ಣ ಹೆಸರು">
+        </label>
+
+        <label>ತಂದೆಯ ಹೆಸರು
+          <input name="fatherName" required maxlength="120" placeholder="ತಂದೆಯ ಪೂರ್ಣ ಹೆಸರು">
+        </label>
+
+        <label>ಜನ್ಮ ದಿನಾಂಕ
+          <input name="dob" type="date" required>
+        </label>
+
+        <label>ಮೊಬೈಲ್ ಸಂಖ್ಯೆ
+          <input name="mobile" type="tel" inputmode="numeric"
+            pattern="[6-9][0-9]{9}" maxlength="10" required
+            placeholder="10 ಅಂಕಿಗಳ ಸಂಖ್ಯೆ">
+        </label>
+
+        <label>ಪರೀಕ್ಷೆಯ ವಿಧಾನ
+          <select name="examinationMode" required>
+            <option value="">ಆಯ್ಕೆಮಾಡಿ</option>
+            <option value="Online">Online (ಆನ್‌ಲೈನ್)</option>
+            <option value="Offline">Offline (ಆಫ್‌ಲೈನ್)</option>
+          </select>
+        </label>
+
+        <div class="fee">
+          <div>
+            <span>ನೋಂದಣಿ ಶುಲ್ಕ</span>
+            <strong>₹250</strong>
+          </div>
+          <span>Razorpay · ಸುರಕ್ಷಿತ ಪಾವತಿ</span>
+        </div>
+
+        <button type="submit" id="submit">ನೋಂದಣಿ ಮಾಡಿ ಪಾವತಿಸಿ</button>
+        <p class="hint">ಪಾವತಿ ಯಶಸ್ವಿಯಾದ ನಂತರ ನೋಂದಣಿ ಸಂಖ್ಯೆಯನ್ನು ತೋರಿಸಲಾಗುತ್ತದೆ.</p>
+      </form>
+
+      <div id="result" class="result hidden" aria-live="polite"></div>
+    </section>
+
+    <section class="features">
+      <article><span>🔐</span><b>ಸುರಕ್ಷಿತ ಮಾಹಿತಿ</b><p>ನೋಂದಣಿಗೆ ಅಗತ್ಯವಿರುವ ವಿವರಗಳು.</p></article>
+      <article><span>💳</span><b>ಆನ್‌ಲೈನ್ ಪಾವತಿ</b><p>Razorpay ಮೂಲಕ ₹250 ಪಾವತಿ.</p></article>
+      <article><span>🧾</span><b>ನೋಂದಣಿ ಸಂಖ್ಯೆ</b><p>ಪಾವತಿ ಪರಿಶೀಲನೆಯ ನಂತರ ಸಂಖ್ಯೆ ಪಡೆಯಿರಿ.</p></article>
+    </section>
+  </main>
+
+  <footer>ವಿದ್ಯಾರ್ಥಿ ನೋಂದಣಿ ಪೋರ್ಟಲ್ · ಸಹಾಯಕ್ಕಾಗಿ ನಿರ್ವಾಹಕರನ್ನು ಸಂಪರ್ಕಿಸಿ</footer>
+  <script src="app.js"></script>
+</body>
+</html>
