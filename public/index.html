@@ -1,303 +1,111 @@
 
-<!DOCTYPE html>
-<html lang="kn">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+/* Main heading */
+.exam-heading {
+  text-align: center;
+  background: linear-gradient(135deg, #102a56, #174c8c);
+  color: #ffffff;
+  padding: 28px 15px;
+  border: 3px solid #e0b54b;
+  border-radius: 14px;
+  margin-bottom: 24px;
+  box-shadow: 0 5px 15px rgba(16, 42, 86, 0.18);
+}
 
-  <title>GENERAL KNOWLEDGE EXAMINATION - Student Registration</title>
+.exam-heading h1 {
+  color: #ffd66b;
+  font-size: clamp(24px, 4vw, 38px);
+  font-weight: 900;
+  line-height: 1.4;
+  margin: 0 0 12px;
+}
 
-  <link rel="stylesheet" href="style.css">
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-  <script src="app.js" defer></script>
+.exam-heading h2 {
+  color: #ffffff;
+  font-size: clamp(23px, 3.5vw, 32px);
+  font-weight: 900;
+  line-height: 1.5;
+  margin: 0;
+}
 
-  <style>
-    .exam-heading {
-      text-align: center;
-      background: linear-gradient(135deg, #073b80, #1476c9);
-      color: white;
-      padding: 28px 15px;
-      border-radius: 12px;
-      margin-bottom: 24px;
-    }
+/* Section headings */
+.form-section-title {
+  color: #123f76;
+  font-size: 21px;
+  font-weight: 800;
+  margin-top: 25px;
+  border-bottom: 2px solid #e0b54b;
+  padding-bottom: 8px;
+}
 
-    .exam-heading h1 {
-      font-size: clamp(24px, 4vw, 38px);
-      font-weight: 900;
-      line-height: 1.35;
-      margin: 0 0 12px;
-    }
+/* Form labels */
+form label {
+  color: #183b62;
+  font-weight: 700;
+}
 
-    .exam-heading h2 {
-      font-size: clamp(23px, 3.5vw, 32px);
-      font-weight: 900;
-      line-height: 1.5;
-      margin: 0;
-    }
+/* Input fields */
+input,
+select,
+textarea {
+  color: #202d40;
+  background-color: #ffffff;
+  border: 1px solid #b9c9dc;
+  border-radius: 7px;
+}
 
-    .form-section-title {
-      color: #073b80;
-      font-size: 21px;
-      font-weight: 800;
-      margin-top: 25px;
-      border-bottom: 2px solid #d6e6f8;
-      padding-bottom: 8px;
-    }
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid #d9aa32;
+  border-color: #174c8c;
+}
 
-    textarea,
-    input,
-    select {
-      width: 100%;
-      box-sizing: border-box;
-    }
+/* Registration fee */
+.fee {
+  color: #123f76;
+  background: #fff8e6;
+  border: 2px solid #e0b54b;
+  border-radius: 10px;
+  padding: 15px;
+  text-align: center;
+}
 
-    input[type="file"] {
-      padding: 10px;
-      background: #f5f8fc;
-    }
+.fee h2 {
+  color: #087443;
+  font-size: 30px;
+  font-weight: 900;
+}
 
-    .required-note {
-      color: #555;
-      font-size: 13px;
-    }
-  </style>
-</head>
+/* Submit button */
+button {
+  background: linear-gradient(135deg, #123f76, #1767a9);
+  color: #ffffff;
+  border: 2px solid #e0b54b;
+  border-radius: 8px;
+  font-size: 17px;
+  font-weight: 800;
+  padding: 14px;
+  cursor: pointer;
+}
 
-<body>
-  <header class="top">
-    <div class="brand">GENERAL KNOWLEDGE EXAMINATION</div>
-  </header>
+button:hover {
+  background: #0b2c55;
+}
 
-  <main class="panel">
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 
-    <div class="exam-heading">
-      <h1>
-        GENERAL KNOWLEDGE EXAMINATION
-        <br>
-        STUDENT REGISTRATION FORM
-      </h1>
+/* Small instructions */
+.required-note {
+  color: #52657a;
+  font-size: 13px;
+}
 
-      <h2>
-        ಸಾಮಾನ್ಯ ಜ್ಞಾನ ಪರೀಕ್ಷೆ
-        <br>
-        ವಿದ್ಯಾರ್ಥಿ ನೋಂದಣಿ ಅರ್ಜಿ
-      </h2>
-    </div>
-
-    <p class="required-note">
-      ದಯವಿಟ್ಟು ಎಲ್ಲಾ ವಿವರಗಳನ್ನು ಸರಿಯಾಗಿ ಭರ್ತಿ ಮಾಡಿ.
-      / Please fill in all details correctly.
-    </p>
-
-    <form id="form">
-
-      <h3 class="form-section-title">
-        Student Details / ವಿದ್ಯಾರ್ಥಿ ವಿವರಗಳು
-      </h3>
-
-      <label for="studentName">
-        Student Name / ವಿದ್ಯಾರ್ಥಿಯ ಹೆಸರು *
-      </label>
-      <input
-        id="studentName"
-        name="studentName"
-        type="text"
-        autocomplete="name"
-        required
-      >
-
-      <label for="fatherName">
-        Student Father Name / ತಂದೆಯ ಹೆಸರು *
-      </label>
-      <input
-        id="fatherName"
-        name="fatherName"
-        type="text"
-        required
-      >
-
-      <label for="dob">
-        Date of Birth / ಜನ್ಮ ದಿನಾಂಕ *
-      </label>
-      <input
-        id="dob"
-        name="dob"
-        type="date"
-        required
-      >
-
-      <label for="mobile">
-        Mobile Number / ಮೊಬೈಲ್ ಸಂಖ್ಯೆ *
-      </label>
-      <input
-        id="mobile"
-        name="mobile"
-        type="tel"
-        inputmode="numeric"
-        pattern="[6-9][0-9]{9}"
-        maxlength="10"
-        placeholder="10-digit mobile number"
-        required
-      >
-
-      <label for="qualification">
-        Qualification / ವಿದ್ಯಾರ್ಹತೆ *
-      </label>
-      <select id="qualification" name="qualification" required>
-        <option value="">Select / ಆಯ್ಕೆ ಮಾಡಿ</option>
-        <option value="Below SSLC">Below SSLC / SSLC ಗಿಂತ ಕಡಿಮೆ</option>
-        <option value="SSLC">SSLC</option>
-        <option value="PUC">PUC</option>
-        <option value="Diploma">Diploma / ಡಿಪ್ಲೊಮಾ</option>
-        <option value="Degree">Degree / ಪದವಿ</option>
-        <option value="Postgraduate">Postgraduate / ಸ್ನಾತಕೋತ್ತರ</option>
-        <option value="Other">Other / ಇತರೆ</option>
-      </select>
-
-      <label for="caste">
-        Caste / ಜಾತಿ *
-      </label>
-      <input
-        id="caste"
-        name="caste"
-        type="text"
-        required
-      >
-
-      <label for="gender">
-        Gender / ಲಿಂಗ *
-      </label>
-      <select id="gender" name="gender" required>
-        <option value="">Select / ಆಯ್ಕೆ ಮಾಡಿ</option>
-        <option value="Male">Male / ಪುರುಷ</option>
-        <option value="Female">Female / ಮಹಿಳೆ</option>
-        <option value="Other">Other / ಇತರೆ</option>
-      </select>
-
-      <label for="aadhaar">
-        Aadhaar Number / ಆಧಾರ್ ಸಂಖ್ಯೆ *
-      </label>
-      <input
-        id="aadhaar"
-        name="aadhaar"
-        type="password"
-        inputmode="numeric"
-        pattern="[0-9]{12}"
-        maxlength="12"
-        autocomplete="off"
-        placeholder="Enter 12-digit Aadhaar"
-        required
-      >
-      <p class="required-note">
-        Privacy note: This form is configured to save only the last four
-        Aadhaar digits in the database. / ಗೌಪ್ಯತೆಗಾಗಿ ಆಧಾರ್‌ನ ಕೊನೆಯ
-        ನಾಲ್ಕು ಅಂಕೆಗಳನ್ನು ಮಾತ್ರ ಡೇಟಾಬೇಸ್‌ನಲ್ಲಿ ಉಳಿಸಲಾಗುತ್ತದೆ.
-      </p>
-
-      <label for="address">
-        Full Address / ಪೂರ್ಣ ವಿಳಾಸ *
-      </label>
-      <textarea
-        id="address"
-        name="address"
-        rows="4"
-        required
-      ></textarea>
-
-      <label for="pincode">
-        Pincode / ಪಿನ್ ಕೋಡ್ *
-      </label>
-      <input
-        id="pincode"
-        name="pincode"
-        type="text"
-        inputmode="numeric"
-        pattern="[0-9]{6}"
-        maxlength="6"
-        placeholder="6-digit PIN code"
-        required
-      >
-
-      <h3 class="form-section-title">
-        Examination Details / ಪರೀಕ್ಷೆಯ ವಿವರಗಳು
-      </h3>
-
-      <label for="examinationMode">
-        Examination Mode / ಪರೀಕ್ಷೆಯ ವಿಧಾನ *
-      </label>
-      <select
-        id="examinationMode"
-        name="examinationMode"
-        required
-      >
-        <option value="Online">Online / ಆನ್‌ಲೈನ್</option>
-        <option value="Offline">Offline / ಆಫ್‌ಲೈನ್</option>
-      </select>
-
-      <h3 class="form-section-title">
-        Photo and Signature / ಫೋಟೋ ಮತ್ತು ಸಹಿ
-      </h3>
-
-      <label for="photo">
-        Student Photo / ವಿದ್ಯಾರ್ಥಿಯ ಫೋಟೋ *
-      </label>
-      <input
-        id="photo"
-        name="photo"
-        type="file"
-        accept="image/jpeg,image/png,image/webp"
-        required
-      >
-      <p class="required-note">
-        JPG, PNG or WebP; maximum 2 MB.
-        / JPG, PNG ಅಥವಾ WebP; ಗರಿಷ್ಠ 2 MB.
-      </p>
-
-      <label for="signature">
-        Student Signature / ವಿದ್ಯಾರ್ಥಿಯ ಸಹಿ *
-      </label>
-      <input
-        id="signature"
-        name="signature"
-        type="file"
-        accept="image/jpeg,image/png,image/webp"
-        required
-      >
-      <p class="required-note">
-        JPG, PNG or WebP; maximum 2 MB.
-        / JPG, PNG ಅಥವಾ WebP; ಗರಿಷ್ಠ 2 MB.
-      </p>
-
-      <div class="fee">
-        <h3>
-          Registration Fee / ನೋಂದಣಿ ಶುಲ್ಕ
-        </h3>
-        <h2>₹250</h2>
-      </div>
-
-      <button id="submit" type="submit">
-        REGISTER & PAY ₹250
-        <br>
-        ನೋಂದಣಿ ಮಾಡಿ ₹250 ಪಾವತಿಸಿ
-      </button>
-
-    </form>
-
-    <div
-      id="result"
-      class="result hidden"
-      role="status"
-      aria-live="polite"
-    ></div>
-
-  </main>
-
-  <footer>
-    <p>
-      GENERAL KNOWLEDGE EXAMINATION
-      <br>
-      ಸಾಮಾನ್ಯ ಜ್ಞಾನ ಪರೀಕ್ಷೆ
-    </p>
-  </footer>
-</body>
-</html>
+/* Footer */
+footer {
+  color: #123f76;
+  text-align: center;
+  font-weight: 700;
+}
