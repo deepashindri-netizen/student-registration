@@ -1,29 +1,18 @@
 
 <!doctype html>
 <html lang="kn">
-  <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#14532d">
 <head>
-    <meta charset="utf-8">
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#14532d">
+  <link rel="manifest" href="/manifest.json">
 
   <title>RABKAVI BANAHATTI GK COMPETITION</title>
 
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
-<script>
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/service-worker.js")
-      .catch(console.error);
-  });
-}
-</script>
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -51,10 +40,7 @@ if ("serviceWorker" in navigator) {
       color: white;
     }
 
-    .trophy {
-      font-size: 42px;
-      margin-bottom: 8px;
-    }
+    .trophy { font-size: 42px; margin-bottom: 8px; }
 
     h1 {
       margin: 0;
@@ -70,10 +56,7 @@ if ("serviceWorker" in navigator) {
       margin-top: 5px;
     }
 
-    .subtitle {
-      margin: 12px 0 0;
-      font-size: 16px;
-    }
+    .subtitle { margin: 12px 0 0; font-size: 16px; }
 
     .instructions {
       line-height: 1.7;
@@ -101,7 +84,7 @@ if ("serviceWorker" in navigator) {
       font-weight: 700;
     }
 
-    input {
+    input:not([type="radio"]) {
       width: 100%;
       padding: 13px;
       border: 1px solid #cbd5e1;
@@ -113,6 +96,25 @@ if ("serviceWorker" in navigator) {
     input:focus {
       outline: 2px solid #93b4ff;
       border-color: #175cd3;
+    }
+
+    .mode-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 10px 0;
+      padding: 13px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 400;
+    }
+
+    .mode-option input {
+      width: 18px;
+      height: 18px;
+      margin: 0;
+      accent-color: #175cd3;
     }
 
     button {
@@ -128,10 +130,7 @@ if ("serviceWorker" in navigator) {
       cursor: pointer;
     }
 
-    button:disabled {
-      opacity: .6;
-      cursor: wait;
-    }
+    button:disabled { opacity: .6; cursor: wait; }
 
     #message {
       margin-top: 18px;
@@ -140,14 +139,8 @@ if ("serviceWorker" in navigator) {
       overflow-wrap: anywhere;
     }
 
-    .success {
-      color: #087443;
-      font-weight: 700;
-    }
-
-    .error {
-      color: #b42318;
-    }
+    .success { color: #087443; font-weight: 700; }
+    .error { color: #b42318; }
 
     .note {
       color: #5b6577;
@@ -165,17 +158,9 @@ if ("serviceWorker" in navigator) {
     }
 
     @media (max-width: 420px) {
-      main {
-        padding: 16px;
-      }
-
-      h1 {
-        font-size: 23px;
-      }
-
-      h1 span {
-        font-size: 21px;
-      }
+      main { padding: 16px; }
+      h1 { font-size: 23px; }
+      h1 span { font-size: 21px; }
     }
   </style>
 </head>
@@ -184,12 +169,10 @@ if ("serviceWorker" in navigator) {
   <main>
     <header class="header">
       <div class="trophy" aria-hidden="true">🏆</div>
-
       <h1>
         RABKAVI BANAHATTI
         <span>GK COMPETITION</span>
       </h1>
-
       <p class="subtitle">STUDENT REGISTRATION</p>
     </header>
 
@@ -246,6 +229,30 @@ if ("serviceWorker" in navigator) {
         required
       >
 
+      <label>Examination Mode ಆಯ್ಕೆಮಾಡಿ *</label>
+
+      <label class="mode-option" for="modeOnline">
+        <input
+          id="modeOnline"
+          name="examinationMode"
+          type="radio"
+          value="Online"
+          required
+        >
+        <span>Online (ಆನ್‌ಲೈನ್ ಪರೀಕ್ಷೆ)</span>
+      </label>
+
+      <label class="mode-option" for="modeOffline">
+        <input
+          id="modeOffline"
+          name="examinationMode"
+          type="radio"
+          value="Offline"
+          required
+        >
+        <span>Offline (ಆಫ್‌ಲೈನ್ ಪರೀಕ್ಷೆ)</span>
+      </label>
+
       <button id="payButton" type="submit">
         ₹250 ಪಾವತಿಸಿ ನೋಂದಣಿ ಮಾಡಿ
       </button>
@@ -258,9 +265,7 @@ if ("serviceWorker" in navigator) {
       ಪಾವತಿ ದೃಢೀಕರಣದ ನಂತರ ನೋಂದಣಿ ಸಂಖ್ಯೆ ಲಭ್ಯವಾಗುತ್ತದೆ.
     </p>
 
-    <footer>
-      RABKAVI BANAHATTI GK COMPETITION
-    </footer>
+    <footer>RABKAVI BANAHATTI GK COMPETITION</footer>
   </main>
 
   <script>
@@ -288,14 +293,13 @@ if ("serviceWorker" in navigator) {
           studentName: String(formData.get("studentName")).trim(),
           fatherName: String(formData.get("fatherName")).trim(),
           dob: String(formData.get("dob")),
-          mobile: String(formData.get("mobile")).trim()
+          mobile: String(formData.get("mobile")).trim(),
+          examinationMode: String(formData.get("examinationMode"))
         };
 
         const orderResponse = await fetch("/api/register", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(student)
         });
 
@@ -317,7 +321,8 @@ if ("serviceWorker" in navigator) {
           key: orderData.keyId,
           amount: orderData.amount,
           currency: orderData.currency,
-          name: orderData.merchantName || "RABKAVI BANAHATTI GK COMPETITION",
+          name: orderData.merchantName ||
+            "RABKAVI BANAHATTI GK COMPETITION",
           description: "GK Competition Registration Fee",
           order_id: orderData.orderId,
 
@@ -326,9 +331,7 @@ if ("serviceWorker" in navigator) {
             contact: student.mobile
           },
 
-          theme: {
-            color: "#175cd3"
-          },
+          theme: { color: "#175cd3" },
 
           handler: async function(paymentResponse) {
             showMessage("ಪಾವತಿಯನ್ನು ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ...");
@@ -338,9 +341,7 @@ if ("serviceWorker" in navigator) {
                 "/api/payments/verify",
                 {
                   method: "POST",
-                  headers: {
-                    "Content-Type": "application/json"
-                  },
+                  headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({
                     registrationId: orderData.registrationId,
                     razorpay_order_id:
@@ -362,17 +363,19 @@ if ("serviceWorker" in navigator) {
               }
 
               showMessage(
-                "ನೋಂದಣಿ ಯಶಸ್ವಿಯಾಗಿದೆ!\nRegistration Number: " +
-                verifyData.registrationNumber,
+                "ನೋಂದಣಿ ಯಶಸ್ವಿಯಾಗಿದೆ!\n" +
+                "Registration Number: " +
+                verifyData.registrationNumber +
+                "\nExamination Mode: " +
+                student.examinationMode,
                 "success"
               );
 
               form.reset();
-
             } catch (error) {
               showMessage(
                 error.message +
-                "\nದಯವಿಟ್ಟು ನಿಮ್ಮ ಪಾವತಿ ವಿವರಗಳನ್ನು ಉಳಿಸಿಕೊಳ್ಳಿ. " +
+                "\nನಿಮ್ಮ ಪಾವತಿ ವಿವರಗಳನ್ನು ಉಳಿಸಿಕೊಳ್ಳಿ. " +
                 "ಮತ್ತೆ ಪಾವತಿಸುವ ಮೊದಲು ಸಹಾಯ ಪಡೆಯಿರಿ.",
                 "error"
               );
@@ -384,9 +387,9 @@ if ("serviceWorker" in navigator) {
           modal: {
             ondismiss: function() {
               showMessage(
-                "Checkout ಮುಚ್ಚಲಾಗಿದೆ. ಪಾವತಿ ಪೂರ್ಣಗೊಳ್ಳದಿದ್ದರೆ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ."
+                "Checkout ಮುಚ್ಚಲಾಗಿದೆ. ಪಾವತಿ ಪೂರ್ಣಗೊಳ್ಳದಿದ್ದರೆ " +
+                "ಮೊದಲು ಪಾವತಿ ಸ್ಥಿತಿಯನ್ನು ಪರಿಶೀಲಿಸಿ."
               );
-
               payButton.disabled = false;
             }
           }
@@ -396,28 +399,32 @@ if ("serviceWorker" in navigator) {
           showMessage(
             "ಪಾವತಿ ವಿಫಲವಾಗಿದೆ: " +
             (
-              response.error &&
-              response.error.description
+              response.error && response.error.description
                 ? response.error.description
                 : "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ."
             ),
             "error"
           );
-
           payButton.disabled = false;
         });
 
         checkout.open();
-
       } catch (error) {
         showMessage(
           error.message || "ಏನೋ ತಪ್ಪಾಗಿದೆ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
           "error"
         );
-
         payButton.disabled = false;
       }
     });
+
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker
+          .register("/service-worker.js")
+          .catch(console.error);
+      });
+    }
   </script>
 </body>
 </html>
