@@ -5,6 +5,7 @@ const express = require("express");
 const helmet = require("helmet");
 const path = require("path");
 const crypto = require("crypto");
+const multer = require("multer");
 const { Pool } = require("pg");
 const Razorpay = require("razorpay");
 
@@ -12,7 +13,7 @@ const app = express();
 const port = Number(process.env.PORT || 3000);
 
 app.use(helmet({ contentSecurityPolicy: false }));
-app.use(express.json());
+app.use(express.json({ limit: "1mb" }));
 app.use(express.static(path.join(__dirname, "public")));
 
 if (!process.env.DATABASE_URL) {
@@ -22,6 +23,22 @@ if (!process.env.DATABASE_URL) {
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false }
+});
+
+// Keep uploaded files in memory temporarily, then save them in PostgreSQL.
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 2 * 1024 * 1024,
+    files: 2
+  },
+  fileFilter: (req, file, callback) => {
+    const allowed = ["image/jpeg", "image/png", "image/webp"];
+    if (!allowed.includes(file.mimetype)) {
+      return callback(new Error("ಫೋಟೋ ಮತ್ತು ಸಹಿಗೆ JPG, PNG ಅಥವಾ WebP ಫೈಲ್ ಬಳಸಿ."));
+    }
+    callback(null, true);
+  }
 });
 
 async function initializeDatabase() {
@@ -40,11 +57,20 @@ async function initializeDatabase() {
     )
   `);
 
-  // Add the new column without deleting existing registrations.
+  // Add columns safely; existing registrations are not deleted.
   await pool.query(`
     ALTER TABLE registrations
-    ADD COLUMN IF NOT EXISTS "examinationMode"
-    TEXT NOT NULL DEFAULT 'Online'
+      ADD COLUMN IF NOT EXISTS "examinationMode" TEXT NOT NULL DEFAULT 'Online',
+      ADD COLUMN IF NOT EXISTS qualification TEXT,
+      ADD COLUMN IF NOT EXISTS caste TEXT,
+      ADD COLUMN IF NOT EXISTS gender TEXT,
+      ADD COLUMN IF NOT EXISTS "aadhaarLast4" TEXT,
+      ADD COLUMN IF NOT EXISTS address TEXT,
+      ADD COLUMN IF NOT EXISTS pincode TEXT,
+      ADD COLUMN IF NOT EXISTS photo BYTEA,
+      ADD COLUMN IF NOT EXISTS "photoMime" TEXT,
+      ADD COLUMN IF NOT EXISTS signature BYTEA,
+      ADD COLUMN IF NOT EXISTS "signatureMime" TEXT
   `);
 }
 
@@ -70,78 +96,122 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-app.post("/api/register", async (req, res) => {
-  let registrationId;
+// Register student details and save photo/signature in PostgreSQL.
+app.post(
+  "/api/register",
+  upload.fields([
+    { name: "photo", maxCount: 1 },
+    { name: "signature", maxCount: 1 }
+  ]),
+  async (req, res) => {
+    let registrationId;
 
-  try {
-    const {
-      studentName,
-      fatherName,
-      dob,
-      mobile,
-      examinationMode
-    } = req.body;
+    try {
+      const {
+        studentName,
+        fatherName,
+        dob,
+        mobile,
+        examinationMode,
+        qualification,
+        caste,
+        gender,
+        aadhaar,
+        address,
+        pincode
+      } = req.body;
 
-    if (
-      !studentName?.trim() ||
-      !fatherName?.trim() ||
-      !dob ||
-      !/^[6-9][0-9]{9}$/.test(String(mobile || "").trim()) ||
-      !["Online", "Offline"].includes(examinationMode)
-    ) {
-      return res.status(400).json({
-        error: "ದಯವಿಟ್ಟು ಎಲ್ಲಾ ವಿವರಗಳನ್ನು ಸರಿಯಾಗಿ ನಮೂದಿಸಿ ಮತ್ತು Examination Mode ಆಯ್ಕೆಮಾಡಿ."
+      const photo = req.files?.photo?.[0];
+      const signature = req.files?.signature?.[0];
+
+      if (
+        !studentName?.trim() ||
+        !fatherName?.trim() ||
+        !dob ||
+        !/^[6-9][0-9]{9}$/.test(String(mobile || "").trim()) ||
+        !["Online", "Offline"].includes(examinationMode) ||
+        !qualification?.trim() ||
+        !caste?.trim() ||
+        !["Male", "Female", "Other"].includes(gender) ||
+        !/^\d{12}$/.test(String(aadhaar || "").trim()) ||
+        !address?.trim() ||
+        !/^\d{6}$/.test(String(pincode || "").trim()) ||
+        !photo ||
+        !signature
+      ) {
+        return res.status(400).json({
+          error: "ಎಲ್ಲಾ ವಿವರಗಳನ್ನು ಭರ್ತಿ ಮಾಡಿ. ಸರಿಯಾದ ಫೋಟೋ ಮತ್ತು ಸಹಿಯನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಿ."
+        });
+      }
+
+      const { client, keyId } = getRazorpay();
+
+      const result = await pool.query(
+        `INSERT INTO registrations (
+          "studentName", "fatherName", dob, mobile, status,
+          "examinationMode", qualification, caste, gender,
+          "aadhaarLast4", address, pincode,
+          photo, "photoMime", signature, "signatureMime"
+        )
+        VALUES (
+          $1, $2, $3, $4, 'pending',
+          $5, $6, $7, $8,
+          $9, $10, $11, $12, $13, $14, $15
+        )
+        RETURNING id`,
+        [
+          studentName.trim(),
+          fatherName.trim(),
+          dob,
+          String(mobile).trim(),
+          examinationMode,
+          qualification.trim(),
+          caste.trim(),
+          gender,
+          String(aadhaar).trim().slice(-4),
+          address.trim(),
+          String(pincode).trim(),
+          photo.buffer,
+          photo.mimetype,
+          signature.buffer,
+          signature.mimetype
+        ]
+      );
+
+      registrationId = result.rows[0].id;
+
+      const order = await client.orders.create({
+        amount: 25000,
+        currency: "INR",
+        receipt: `student_${registrationId}`
+      });
+
+      await pool.query(
+        `UPDATE registrations
+         SET "razorpayOrderId" = $1
+         WHERE id = $2`,
+        [order.id, registrationId]
+      );
+
+      return res.json({
+        registrationId,
+        orderId: order.id,
+        amount: order.amount,
+        currency: order.currency,
+        keyId,
+        merchantName: "RABKAVI BANAHATTI GK COMPETITION"
+      });
+    } catch (error) {
+      console.error("Registration error:", error.message || error);
+
+      return res.status(500).json({
+        error: "ನೋಂದಣಿ ಅಥವಾ ಪಾವತಿ ಸಿದ್ಧಪಡಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಸಹಾಯ ಪಡೆಯಿರಿ."
       });
     }
-
-    const { client, keyId } = getRazorpay();
-
-    const result = await pool.query(
-      `INSERT INTO registrations
-       ("studentName", "fatherName", dob, mobile, status, "examinationMode")
-       VALUES ($1, $2, $3, $4, 'pending', $5)
-       RETURNING id`,
-      [
-        studentName.trim(),
-        fatherName.trim(),
-        dob,
-        String(mobile).trim(),
-        examinationMode
-      ]
-    );
-
-    registrationId = result.rows[0].id;
-
-    const order = await client.orders.create({
-      amount: 25000,
-      currency: "INR",
-      receipt: `student_${registrationId}`
-    });
-
-    await pool.query(
-      `UPDATE registrations
-       SET "razorpayOrderId" = $1
-       WHERE id = $2`,
-      [order.id, registrationId]
-    );
-
-    return res.json({
-      registrationId,
-      orderId: order.id,
-      amount: order.amount,
-      currency: order.currency,
-      keyId,
-      merchantName: "RABKAVI BANAHATTI GK COMPETITION"
-    });
-  } catch (error) {
-    console.error("Registration error:", error.message || error);
-
-    return res.status(500).json({
-      error: "ಪಾವತಿ ಸಿದ್ಧಪಡಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಸಹಾಯ ಪಡೆಯಿರಿ."
-    });
   }
-});
+);
 
+// Verify Razorpay payment before marking registration as paid.
 app.post("/api/payments/verify", async (req, res) => {
   try {
     const {
@@ -246,6 +316,7 @@ app.post("/api/payments/verify", async (req, res) => {
   }
 });
 
+// Return basic registration status only; do not expose Aadhaar or uploaded files.
 app.get("/api/registration/:id", async (req, res) => {
   try {
     const result = await pool.query(
@@ -270,6 +341,23 @@ app.get("/api/registration/:id", async (req, res) => {
       error: "ನೋಂದಣಿ ವಿವರಗಳನ್ನು ಪಡೆಯಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ."
     });
   }
+});
+
+// Friendly errors for invalid uploads and files over 2 MB.
+app.use((error, req, res, next) => {
+  if (error instanceof multer.MulterError) {
+    return res.status(400).json({
+      error: "ಫೋಟೋ ಅಥವಾ ಸಹಿ 2 MB ಮೀರಬಾರದು. ಚಿಕ್ಕ ಫೈಲ್ ಆಯ್ಕೆಮಾಡಿ."
+    });
+  }
+
+  if (error) {
+    return res.status(400).json({
+      error: error.message || "ಅಪ್ಲೋಡ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ."
+    });
+  }
+
+  next();
 });
 
 initializeDatabase()
