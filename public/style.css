@@ -207,3 +207,85 @@ footer {
   }
 }
 
+
+/* Dark navy blue and gold theme */
+:root {
+  --navy: #0b1e3d;
+  --navy-light: #16345f;
+  --gold: #d4af37;
+  --gold-light: #f4d77a;
+  --page-bg: #f3f6fb;
+  --text-dark: #17243a;
+}
+
+body {
+  font-family: 'Noto Sans Kannada', sans-serif;
+  background: var(--page-bg);
+  color: var(--text-dark);
+  line-height: 1.7;
+  margin: 0;
+}
+
+h1, h2, h3, h4 {
+  color: var(--navy);
+  font-family: 'Noto Sans Kannada', sans-serif;
+  line-height: 1.4;
+}
+
+header, .header, .main-header {
+  background: var(--navy);
+  color: white;
+  border-bottom: 4px solid var(--gold);
+  padding: 20px;
+  text-align: center;
+}
+
+input, select, textarea {
+  font-family: 'Noto Sans Kannada', sans-serif;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 11px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #fff;
+  color: var(--text-dark);
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: 2px solid var(--gold);
+  border-color: var(--navy-light);
+}
+
+button {
+  font-family: 'Noto Sans Kannada', sans-serif;
+  background: var(--navy);
+  color: white;
+  border: 2px solid var(--gold);
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:hover {
+  background: var(--navy-light);
+}
+
+img {
+  max-width: 100%;
+}
+
+@media (max-width: 600px) {
+  body {
+    font-size: 15px;
+  }
+
+  input, select, textarea {
+    font-size: 16px;
+  }
+
+  button {
+    max-width: 100%;
+  }
+}
