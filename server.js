@@ -39,6 +39,13 @@ async function initializeDatabase() {
       "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
+
+  // Add the new column without deleting existing registrations.
+  await pool.query(`
+    ALTER TABLE registrations
+    ADD COLUMN IF NOT EXISTS "examinationMode"
+    TEXT NOT NULL DEFAULT 'Online'
+  `);
 }
 
 function getRazorpay() {
@@ -67,16 +74,23 @@ app.post("/api/register", async (req, res) => {
   let registrationId;
 
   try {
-    const { studentName, fatherName, dob, mobile } = req.body;
+    const {
+      studentName,
+      fatherName,
+      dob,
+      mobile,
+      examinationMode
+    } = req.body;
 
     if (
       !studentName?.trim() ||
       !fatherName?.trim() ||
       !dob ||
-      !/^[6-9][0-9]{9}$/.test(String(mobile || "").trim())
+      !/^[6-9][0-9]{9}$/.test(String(mobile || "").trim()) ||
+      !["Online", "Offline"].includes(examinationMode)
     ) {
       return res.status(400).json({
-        error: "ದಯವಿಟ್ಟು ಎಲ್ಲಾ ವಿವರಗಳನ್ನು ಸರಿಯಾಗಿ ನಮೂದಿಸಿ."
+        error: "ದಯವಿಟ್ಟು ಎಲ್ಲಾ ವಿವರಗಳನ್ನು ಸರಿಯಾಗಿ ನಮೂದಿಸಿ ಮತ್ತು Examination Mode ಆಯ್ಕೆಮಾಡಿ."
       });
     }
 
@@ -84,14 +98,15 @@ app.post("/api/register", async (req, res) => {
 
     const result = await pool.query(
       `INSERT INTO registrations
-       ("studentName", "fatherName", dob, mobile, status)
-       VALUES ($1, $2, $3, $4, 'pending')
+       ("studentName", "fatherName", dob, mobile, status, "examinationMode")
+       VALUES ($1, $2, $3, $4, 'pending', $5)
        RETURNING id`,
       [
         studentName.trim(),
         fatherName.trim(),
         dob,
-        String(mobile).trim()
+        String(mobile).trim(),
+        examinationMode
       ]
     );
 
@@ -234,7 +249,8 @@ app.post("/api/payments/verify", async (req, res) => {
 app.get("/api/registration/:id", async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT id, "studentName", status, "registrationNumber"
+      `SELECT id, "studentName", status, "registrationNumber",
+              "examinationMode"
        FROM registrations
        WHERE id = $1`,
       [req.params.id]
