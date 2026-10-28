@@ -1,86 +1,99 @@
 
-<!doctype html>
+<!DOCTYPE html>
 <html lang="kn">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>ವಿದ್ಯಾರ್ಥಿ ನೋಂದಣಿ ಪೋರ್ಟಲ್</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Student Registration | RABKAVI BANAHATTI GK COMPETITION</title>
+
   <link rel="stylesheet" href="style.css">
+
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
-  <script src="app.js"></script>
-  <body>
+
+<body>
   <header class="top">
-    <div class="brand">
-      <span class="cap">🎓</span>
-      <div>
-        <b>ವಿದ್ಯಾರ್ಥಿ ನೋಂದಣಿ ಪೋರ್ಟಲ್</b>
-        <small>Student Registration Portal</small>
-      </div>
-    </div>
-    <span class="tag">ಸುರಕ್ಷಿತ ನೋಂದಣಿ</span>
+    <div class="brand">RABKAVI BANAHATTI GK COMPETITION</div>
+    <p class="intro">ವಿದ್ಯಾರ್ಥಿಗಳ ನೋಂದಣಿ ಅರ್ಜಿ</p>
   </header>
 
-  <main class="wrap">
-    <section class="intro">
-      <p class="overline">STUDENT REGISTRATION</p>
-      <h1>ನಿಮ್ಮ ಭವಿಷ್ಯಕ್ಕೆ<br>ಇಂದು ಒಂದು ಹೆಜ್ಜೆ</h1>
-      <p>ವಿದ್ಯಾರ್ಥಿಯ ವಿವರಗಳನ್ನು ಭರ್ತಿ ಮಾಡಿ, ₹250 ನೋಂದಣಿ ಶುಲ್ಕ ಪಾವತಿಸಿ.</p>
-    </section>
+  <main class="panel">
+    <h1>ವಿದ್ಯಾರ್ಥಿ ನೋಂದಣಿ</h1>
+    <p>ದಯವಿಟ್ಟು ನಿಮ್ಮ ವಿವರಗಳನ್ನು ಸರಿಯಾಗಿ ಭರ್ತಿ ಮಾಡಿ.</p>
 
-    <section class="panel">
-      <h2>ನೋಂದಣಿ ಅರ್ಜಿ <small>Registration Form</small></h2>
+    <form id="form">
+      <label for="studentName">ವಿದ್ಯಾರ್ಥಿಯ ಪೂರ್ಣ ಹೆಸರು</label>
+      <input
+        type="text"
+        id="studentName"
+        name="studentName"
+        placeholder="ವಿದ್ಯಾರ್ಥಿಯ ಹೆಸರು"
+        required
+      >
 
-      <form id="form">
-        <label>ವಿದ್ಯಾರ್ಥಿಯ ಹೆಸರು
-          <input name="studentName" required maxlength="120" placeholder="ಪೂರ್ಣ ಹೆಸರು">
-        </label>
+      <label for="fatherName">ತಂದೆಯ ಹೆಸರು</label>
+      <input
+        type="text"
+        id="fatherName"
+        name="fatherName"
+        placeholder="ತಂದೆಯ ಹೆಸರು"
+        required
+      >
 
-        <label>ತಂದೆಯ ಹೆಸರು
-          <input name="fatherName" required maxlength="120" placeholder="ತಂದೆಯ ಪೂರ್ಣ ಹೆಸರು">
-        </label>
+      <label for="dob">ಜನ್ಮ ದಿನಾಂಕ</label>
+      <input
+        type="date"
+        id="dob"
+        name="dob"
+        required
+      >
 
-        <label>ಜನ್ಮ ದಿನಾಂಕ
-          <input name="dob" type="date" required>
-        </label>
+      <label for="mobile">ಮೊಬೈಲ್ ಸಂಖ್ಯೆ</label>
+      <input
+        type="tel"
+        id="mobile"
+        name="mobile"
+        placeholder="10 ಅಂಕಿಯ ಮೊಬೈಲ್ ಸಂಖ್ಯೆ"
+        pattern="[6-9][0-9]{9}"
+        maxlength="10"
+        inputmode="numeric"
+        required
+      >
 
-        <label>ಮೊಬೈಲ್ ಸಂಖ್ಯೆ
-          <input name="mobile" type="tel" inputmode="numeric"
-            pattern="[6-9][0-9]{9}" maxlength="10" required
-            placeholder="10 ಅಂಕಿಗಳ ಸಂಖ್ಯೆ">
-        </label>
+      <label for="examinationMode">ಪರೀಕ್ಷೆಯ ವಿಧಾನ</label>
+      <select
+        id="examinationMode"
+        name="examinationMode"
+        required
+      >
+        <option value="">ಪರೀಕ್ಷೆಯ ವಿಧಾನ ಆಯ್ಕೆಮಾಡಿ</option>
+        <option value="Online">Online (ಆನ್‌ಲೈನ್)</option>
+        <option value="Offline">Offline (ಆಫ್‌ಲೈನ್)</option>
+      </select>
 
-        <label>ಪರೀಕ್ಷೆಯ ವಿಧಾನ
-          <select name="examinationMode" required>
-            <option value="">ಆಯ್ಕೆಮಾಡಿ</option>
-            <option value="Online">Online (ಆನ್‌ಲೈನ್)</option>
-            <option value="Offline">Offline (ಆಫ್‌ಲೈನ್)</option>
-          </select>
-        </label>
+      <div class="fee">
+        <p>ನೋಂದಣಿ ಶುಲ್ಕ</p>
+        <h2>₹250</h2>
+      </div>
 
-        <div class="fee">
-          <div>
-            <span>ನೋಂದಣಿ ಶುಲ್ಕ</span>
-            <strong>₹250</strong>
-          </div>
-          <span>Razorpay · ಸುರಕ್ಷಿತ ಪಾವತಿ</span>
-        </div>
+      <button type="submit" id="submit">
+        ನೋಂದಣಿ ಮಾಡಿ ಪಾವತಿಸಿ
+      </button>
 
-        <button type="submit" id="submit">ನೋಂದಣಿ ಮಾಡಿ ಪಾವತಿಸಿ</button>
-        <p class="hint">ಪಾವತಿ ಯಶಸ್ವಿಯಾದ ನಂತರ ನೋಂದಣಿ ಸಂಖ್ಯೆಯನ್ನು ತೋರಿಸಲಾಗುತ್ತದೆ.</p>
-      </form>
+      <p id="result" class="result hidden" role="status"></p>
+    </form>
 
-      <div id="result" class="result hidden" aria-live="polite"></div>
-    </section>
-
-    <section class="features">
-      <article><span>🔐</span><b>ಸುರಕ್ಷಿತ ಮಾಹಿತಿ</b><p>ನೋಂದಣಿಗೆ ಅಗತ್ಯವಿರುವ ವಿವರಗಳು.</p></article>
-      <article><span>💳</span><b>ಆನ್‌ಲೈನ್ ಪಾವತಿ</b><p>Razorpay ಮೂಲಕ ₹250 ಪಾವತಿ.</p></article>
-      <article><span>🧾</span><b>ನೋಂದಣಿ ಸಂಖ್ಯೆ</b><p>ಪಾವತಿ ಪರಿಶೀಲನೆಯ ನಂತರ ಸಂಖ್ಯೆ ಪಡೆಯಿರಿ.</p></article>
-    </section>
+    <p class="hint">
+      ಪಾವತಿ ಪೂರ್ಣಗೊಂಡ ನಂತರ ನಿಮ್ಮ ನೋಂದಣಿ ಸಂಖ್ಯೆಯನ್ನು ತೋರಿಸಲಾಗುತ್ತದೆ.
+    </p>
   </main>
 
-  <footer>ವಿದ್ಯಾರ್ಥಿ ನೋಂದಣಿ ಪೋರ್ಟಲ್ · ಸಹಾಯಕ್ಕಾಗಿ ನಿರ್ವಾಹಕರನ್ನು ಸಂಪರ್ಕಿಸಿ</footer>
+  <footer>
+    <p>RABKAVI BANAHATTI GK COMPETITION</p>
+  </footer>
+
   <script src="app.js"></script>
 </body>
 </html>
+
