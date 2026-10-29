@@ -294,3 +294,26 @@ img {
   }
 }
 
+@media (max-width: 600px) {
+  .prize-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  .prize-grid h3 {
+    font-size: 13px;
+  }
+
+  .prize-grid h2 {
+    font-size: 17px;
+  }
+
+  .prize-grid p {
+    font-size: 12px;
+    overflow-wrap: anywhere;
+  }
+
+  .prize-grid img {
+    height: 110px !important;
+  }
+}
