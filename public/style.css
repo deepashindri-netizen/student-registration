@@ -276,16 +276,21 @@ img {
   max-width: 100%;
 }
 
+
+/* Donor cards: 2 columns on mobile */
 @media (max-width: 600px) {
-  body {
-    font-size: 15px;
+  .donor-container,
+  .donor-cards,
+  .donors-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
   }
 
-  input, select, textarea {
-    font-size: 16px;
-  }
-
-  button {
+  .donor-container img,
+  .donor-cards img,
+  .donors-grid img {
     max-width: 100%;
+    height: auto;
   }
 }
+
